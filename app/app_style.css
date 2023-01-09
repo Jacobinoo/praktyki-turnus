@@ -1,14 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 :root {
+    font-family: 'Inter', sans-serif;
     --icon: #9BA3EB;
     --card-bg: #646FD4;
+    --card-shadow: #6168ac;
     --card-h1: white;
     --main-bg: #DBDFFD;
-    --btn: #9BA3EB;
+    --component: rgb(158, 166, 226);
+    --component-hover: rgb(148, 163, 255);
+    --code: rgb(228, 229, 240);
+    --squares: rgba(228, 229, 240, 0.808); 
+    --status-text: rgb(77, 92, 253); 
+    --btn: rgb(155, 163, 235);
+    --btn-hover: rgb(119, 127, 201);
+    --btn-destructive: rgb(255, 99, 60);
+    --btn-destructive-hover: rgb(199, 83, 54);
     --blue-shadow: rgba(0, 0, 0, 0.274);
 }
 body{
-    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
     display: flex;
@@ -18,12 +27,15 @@ body{
     align-items: center;
 }
 #container{
-    min-height: 700px;
+    height: 700px;
     width: 600px;
     background-color: var(--card-bg);
     border-radius: 20px;
     padding-bottom: 25px;
     overflow: hidden;
+    -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    box-shadow: 0px 0px 13px -1px var(--card-shadow);
 }
 #baner{
     display: flex;
@@ -31,6 +43,7 @@ body{
     color: var(--card-bg);
     align-items: center;
     background-color: white;
+    height: 40px;
     padding: 25px;
 }
 #logo {
@@ -46,22 +59,120 @@ body{
 }
 p {
     font-size: 18px;
-    font-weight: 500;
+    font-weight: 600;
     user-select: none;
 }
-#add-btn{
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+.add-btn{
     background-color: var(--btn);
-    font-size: 16px;
-    height: auto;
-    width: auto;
+    font-size: 30px;
+}
+.logout-btn{
+    background-color: var(--btn-destructive);
+    font-size: 24px;
+}
+.btn {
+    height: 32px;
+    width: 32px;
     border-radius: 10px;
     color: white;
-    padding: 10px;
+    padding: 4px;
     text-transform: uppercase;
-    font-weight: 700;
     cursor: pointer;
     user-select: none;
+    font-weight: 700;
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease-in-out;
 }
-#add-btn:hover{
-    background-color: rgb(113, 120, 160);
+.logout-btn:hover{
+    background-color: var(--btn-destructive-hover);
+    transform: scale(1.1);
+}
+.add-btn:hover{
+    background-color: var(--btn-hover);
+    transform: scale(1.1);
+}
+#content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 615px;
+    overflow-y: scroll;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 20px;
+    scrollbar-width: thin;
+    user-select: none;
+}
+.component{
+    display: flex;
+    flex-direction: column;
+    color: white;
+    width: 90%;
+    height: 100px;
+    background-color: var(--component);
+    justify-content: center;
+    border-radius: 10px;
+    margin-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+.component:hover {
+    background-color: var(--component-hover);
+    transform: scale(1.02);
+}
+.component-name{
+    width: 100%;
+    font-size: 16px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.squares{
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+    align-items: center;
+}
+.code{
+    border: solid 1px var(--code);
+    border-radius: 4px;
+    padding: 2px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    font-weight: 600;
+}
+.date{
+    border: solid 1px var(--squares);
+    border-radius: 4px;
+    padding: 2px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+.status{
+    border: solid 1px var(--squares);
+    border-radius: 4px;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+}
+.status-text{
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--status-text);
 }

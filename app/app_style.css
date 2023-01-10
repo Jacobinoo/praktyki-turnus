@@ -1,229 +1,405 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 :root {
-    font-family: 'Inter', sans-serif;
-    --icon: #9BA3EB;
-    --card-bg: #646FD4;
-    --card-shadow: #6168ac;
-    --card-h1: white;
-    --main-bg: #DBDFFD;
-    --component: rgb(158, 166, 226);
-    --component-hover: rgb(148, 163, 255);
-    --code: rgb(228, 229, 240);
-    --squares: rgba(228, 229, 240, 0.808); 
-    --status-text: rgb(77, 92, 253); 
-    --btn: rgb(155, 163, 235);
-    --btn-hover: rgb(119, 127, 201);
-    --btn-destructive: rgb(255, 99, 60);
-    --btn-destructive-hover: rgb(199, 83, 54);
-    --blue-shadow: rgba(0, 0, 0, 0.274);
+  font-family: "Inter", sans-serif;
+  --icon: #9ba3eb;
+  --card-bg: #646fd4;
+  --card-shadow: #6168ac;
+  --card-h1: white;
+  --main-bg: #dbdffd;
+  --component: rgb(158, 166, 226);
+  --component-hover: rgb(148, 163, 255);
+  --code: rgb(228, 229, 240);
+  --squares: rgba(228, 229, 240, 0.808);
+  --status-text-active: rgb(77, 92, 253);
+  --status-text-inactive: rgba(99, 104, 143, 0.973);
+  --btn: rgb(155, 163, 235);
+  --btn-hover: rgb(119, 127, 201);
+  --btn-destructive: rgb(255, 99, 60);
+  --btn-destructive-hover: rgb(199, 83, 54);
+  --blue-shadow: rgba(0, 0, 0, 0.274);
 }
-body{
-    margin: 0;
-    padding: 0;
+body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  min-height: 100vh;
+  justify-content: center;
+  background-color: var(--main-bg);
+  align-items: center;
+}
+#container {
+  height: 700px;
+  width: 600px;
+  background-color: var(--card-bg);
+  border-radius: 20px;
+  padding-bottom: 25px;
+  overflow: hidden;
+  -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+  -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+  box-shadow: 0px 0px 13px -1px var(--card-shadow);
+}
+#baner {
+  display: flex;
+  justify-content: space-between;
+  color: var(--card-bg);
+  align-items: center;
+  background-color: white;
+  height: 40px;
+  padding: 25px;
+}
+#logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+.bi-mortarboard-fill {
+  font-size: 40px;
+  color: var(--icon);
+}
+p {
+  font-size: 18px;
+  font-weight: 600;
+  user-select: none;
+}
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+.add-btn {
+  background-color: var(--btn);
+  font-size: 30px;
+}
+.logout-btn {
+  background-color: var(--btn-destructive);
+  font-size: 24px;
+}
+.btn {
+  height: 32px;
+  width: 32px;
+  border-radius: 10px;
+  color: white;
+  padding: 4px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.1s ease-in-out;
+}
+.logout-btn:hover {
+  background-color: var(--btn-destructive-hover);
+  transform: scale(1.1);
+}
+.add-btn:hover {
+  background-color: var(--btn-hover);
+  transform: scale(1.1);
+}
+#content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 615px;
+  overflow-y: auto;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 20px;
+  scrollbar-width: thin;
+  user-select: none;
+}
+.course {
+  display: flex;
+  flex: 0;
+  flex-direction: column;
+  color: white;
+  width: 90%;
+  height: 100px !important;
+   max-height: 100px !important;
+  background-color: var(--component);
+  justify-content: center;
+  border-radius: 10px;
+  margin-top: 10px;
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+}
+.course:hover {
+  background-color: var(--component-hover);
+  transform: scale(1.02);
+}
+.course-name {
+  width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.squares {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+  align-items: center;
+}
+.code {
+  border: solid 1px var(--code);
+  border-radius: 4px;
+  padding: 2px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  align-content: center;
+  font-weight: 600;
+}
+.date {
+  border: solid 1px var(--squares);
+  border-radius: 4px;
+  padding: 2px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+.status {
+  border: solid 1px var(--squares);
+  border-radius: 4px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  align-content: center;
+}
+.status-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--status-text-active);
+}
+
+/*Curtain*/
+.curtain {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  min-height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.8);
+  cursor: not-allowed;
+}
+.new-course-form {
+  width: 700px;
+  height: 650px;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+.new-course-form-header {
+  height: 35px;
+  padding: 22px;
+  background-color: rgb(100, 111, 212);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 600;
+  position: relative;
+  font-size: 20px;
+}
+.new-course-form-header > svg {
+  font-size: 26px;
+  opacity: 0.7;
+  position: absolute;
+  right: 15px;
+  cursor: pointer;
+}
+.new-course-form-header > svg:hover {
+  opacity: 1;
+}
+.new-course-form-content {
+  padding: 25px;
+  padding-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.new-course-form-content-info-wrapper {
     display: flex;
-    min-height: 100vh;
-    justify-content: center;
-    background-color: var(--main-bg);
-    align-items: center;
+    flex-direction: column;
+    background-color: rgb(197, 202, 255);
+    border-radius: 12px;
+    padding: 15px;
+    gap: 14px;
+  }
+.new-course-form-content-input,
+.new-course-form-content-date-input {
+  font-family: "Inter", sans-serif;
+  width: 300px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid gray;
+  font-size: 14px;
+  font-weight: 500;
 }
-#container{
-    height: 700px;
-    width: 600px;
-    background-color: var(--card-bg);
+.new-course-form-content-date-input {
+  color: gray;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+::placeholder {
+  color: gray;
+  opacity: 1;
+}
+:-ms-input-placeholder {
+  color: gray;
+}
+::-ms-input-placeholder {
+  color: gray;
+}
+.new-course-form-content-date-wrapper {
+  display: flex;
+  flex-direction: column;
+  background-color: rgb(197, 202, 255);
+  border-radius: 12px;
+  padding: 10px;
+}
+.new-course-form-content-date-wrapper > label {
+    font-size: 14px;
+}
+.add-course-btn {
+  height: auto;
+  width: auto;
+  margin-top: 15px;
+  background-color: var(--btn);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+.add-course-btn:hover {
+    background-color: var(--btn-hover);
+}
+
+.course-details {
+    width: 80%;
+    min-height: 700px;
     border-radius: 20px;
+    background-color: var(--card-bg);
     padding-bottom: 25px;
     overflow: hidden;
     -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
     -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
     box-shadow: 0px 0px 13px -1px var(--card-shadow);
 }
-#baner{
+.course-details-header {
     display: flex;
-    justify-content: space-between;
     color: var(--card-bg);
-    align-items: center;
     background-color: white;
     height: 40px;
     padding: 25px;
-}
-#logo {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    font-weight: 600;
-}
-.bi-mortarboard-fill{
-    font-size: 40px;
-    color: var(--icon);
-}
-p {
-    font-size: 18px;
-    font-weight: 600;
-    user-select: none;
-}
-.buttons {
-    display: flex;
-    gap: 10px;
-}
-.add-btn{
-    background-color: var(--btn);
-    font-size: 30px;
-}
-.logout-btn{
-    background-color: var(--btn-destructive);
-    font-size: 24px;
-}
-.btn {
-    height: 32px;
-    width: 32px;
-    border-radius: 10px;
-    color: white;
-    padding: 4px;
-    text-transform: uppercase;
-    cursor: pointer;
-    user-select: none;
+    font-size: 20px;
     font-weight: 700;
-    display:flex;
+    color: black;
+    gap: 6px;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    transition: all 0.1s ease-in-out;
 }
-.logout-btn:hover{
-    background-color: var(--btn-destructive-hover);
-    transform: scale(1.1);
+.course-details-header > svg {
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-size: 26px;
+    cursor: pointer;
+    opacity: 0.7;
+    color: var(--card-bg)
 }
-.add-btn:hover{
-    background-color: var(--btn-hover);
-    transform: scale(1.1);
+.course-details-header > svg:hover {
+    opacity: 1;
 }
-#content{
+.course-details-header-wrapper {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    height: 615px;
-    overflow-y: scroll;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-bottom: 20px;
-    scrollbar-width: thin;
-    user-select: none;
-}
-.component{
-    display: flex;
-    flex-direction: column;
-    color: white;
-    width: 90%;
-    height: 100px;
-    background-color: var(--component);
     justify-content: center;
-    border-radius: 10px;
-    margin-top: 10px;
-    padding-left: 20px;
-    padding-right: 20px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-    cursor: pointer;
-    transition: all 0.1s ease-in-out;
 }
-.component:hover {
-    background-color: var(--component-hover);
-    transform: scale(1.02);
-}
-.component-name{
-    width: 100%;
-    font-size: 16px;
+b {
     font-weight: 700;
+}
+.course-details-header-squares {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    width: fit-content;
+}
+.course-details-header-squares > span {
+    border-radius: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: 1px solid black;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;
 }
-.squares{
+.course-details-content {
     display: flex;
-    gap: 10px;
-    margin-top: 5px;
+    flex-direction: column;
     align-items: center;
-}
-.code{
-    border: solid 1px var(--code);
-    border-radius: 4px;
-    padding: 2px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    align-content: center;
-    font-weight: 600;
-}
-.date{
-    border: solid 1px var(--squares);
-    border-radius: 4px;
-    padding: 2px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    align-content: center;
-}
-.status{
-    border: solid 1px var(--squares);
-    border-radius: 4px;
-    padding: 2px;
-    display: flex;
-    align-items: center;
-    align-content: center;
-}
-.status-text{
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--status-text);
-}
-
-
-
-
-
-/*Curtain*/
-.curtain {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 100;
-    width: 100%;
-    min-height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0, 0, 0, 0.9);
-}
-
-.new-course-form {
-    width: 700px;
-    height: 600px;
-    background-color: white;
-    border-radius: 20px;
-    overflow: hidden;
-}
-.new-course-form-header {
-    height: 35px;
-    padding: 15px;
-    background-color: rgb(100, 111, 212);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-weight: 600;
-    position: relative;
-}
-.new-course-form-header > svg {
-    font-size: 26px;
-    opacity: 0.7;
-    position: absolute;
-    right: 15px;
-    cursor: pointer;
-}
-.new-course-form-header > svg:hover {
-    opacity: 1;
-}.new-course-form-content {
+    overflow-y: auto;
     padding: 25px;
+    scrollbar-width: thin;
+}
+.new-participant-form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.new-participant-form > input{
+    font-family: "Inter", sans-serif;
+    width: 300px;
+    padding: 8px;
+    border-radius: 12px;
+    border: 1px solid gray;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  }
+  #birth-date{
+    color: gray;
+  }
+  .new-participant-form > h3{
+    text-align: center;
+    color: white;
+}
+.add-participant-btn{
+    height: auto;
+    width: 150px;
+    background-color: var(--btn);
+    border-radius: 20px;
+    padding: 5px;
+    text-align: center;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+}
+.add-participant-btn:hover{
+    background-color: var(--btn-hover);
 }

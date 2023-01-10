@@ -1,4 +1,8 @@
-
+window.addEventListener('load', function () {
+console.log("loaded")
+$('input').val("")
+$('input:first').focus()
+})
 
 
 

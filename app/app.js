@@ -1,13 +1,18 @@
-import { Template } from "./templates.js";
-const templates = new Template();
+import { newCourseForm,renderCourseDetailsView } from "./functions.js"
 const body = document.querySelector("body");
 const addBtn = document.querySelector(".add-btn");
 const mainUI_List = document.querySelector("#container")
 const logoutBtn = document.querySelector(".logout-btn");
 const selectedCourse = document.querySelector(".course");
+
+
+let courseId = null
+
+
+
+
 //Curtain
 const curtain = document.querySelector(".curtain");
-
 //New Course Form
 addBtn.addEventListener("click", function () {
   UI_showNewCourseForm();
@@ -16,7 +21,7 @@ addBtn.addEventListener("click", function () {
 function UI_showNewCourseForm() {
   curtain.style.display = "flex";
   const form = document.createElement("div");
-  form.innerHTML = templates.newCourseForm;
+  form.innerHTML = newCourseForm();
   form.className = "new-course-form";
   curtain.appendChild(form);
   form
@@ -34,14 +39,14 @@ logoutBtn.addEventListener("click", function () {
 UI_redirectDetailsView()
 //Course Click >> Course Details
 selectedCourse.addEventListener("click", function (e) {
-  let courseId = e.currentTarget.dataset.id
+  courseId = e.currentTarget.dataset.id
   console.log(`Redirecting to Details View of Course: ${courseId}`);
   UI_redirectDetailsView()
 });
 
 function UI_redirectDetailsView() {
   const UI = document.createElement("div");
-  UI.innerHTML = templates.courseDetailsView;
+  UI.innerHTML = renderCourseDetailsView(courseId);
   UI.className = "course-details";
   mainUI_List.style.display = "none"
   body.appendChild(UI);

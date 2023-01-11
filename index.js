@@ -4,8 +4,29 @@ $('input').val("")
 $('input:first').focus()
 })
 
+document.querySelector('.login-btn').addEventListener('click', function () {
+  let code = ""
+  document.querySelectorAll('.code-input').forEach(input => {
+    code += input.value
+  });
+  sendLoginCode(code)
+})
 
-
+async function sendLoginCode(code) {
+  const response = await fetch('http://localhost:80/praktyki-turnus/server/api.php', {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: `{
+      login_code: ${code}
+    }`
+  })
+  response.json().then(data => {
+    console.log(data)
+  })
+}
 
 
 

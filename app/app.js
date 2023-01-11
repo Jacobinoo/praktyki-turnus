@@ -36,7 +36,6 @@ function UI_showNewCourseForm() {
 logoutBtn.addEventListener("click", function () {
   window.location.href = "/index.html"
 });
-UI_redirectDetailsView()
 //Course Click >> Course Details
 selectedCourse.addEventListener("click", function (e) {
   courseId = e.currentTarget.dataset.id

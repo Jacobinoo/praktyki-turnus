@@ -19,12 +19,14 @@ async function sendLoginCode(code) {
       'Accept': 'application/json',
       'Content-Type': 'application/json'
     },
-    body: `{
-      login_code: ${code}
-    }`
+    body: `{"login_code": "${code}"}`
   })
   response.json().then(data => {
+    if(response.status !== 200) throw new Error(`${data.error}`)
     console.log(data)
+    window.location.href = "./app/panel.php"
+  }).catch((err) => {
+    console.error(err)
   })
 }
 

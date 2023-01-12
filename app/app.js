@@ -1,4 +1,5 @@
 import { newCourseForm,renderCourseDetailsView } from "./functions.js"
+
 const body = document.querySelector("body");
 const addBtn = document.querySelector(".add-btn");
 const mainUI_List = document.querySelector("#container")
@@ -34,7 +35,27 @@ function UI_showNewCourseForm() {
 
 //Logout Btn
 logoutBtn.addEventListener("click", function () {
-  window.location.href = "/index.html"
+logout()
+async function logout() {
+  const response = await fetch('http://localhost:80/praktyki-turnus/server/api.php?logout=1', {
+    method: 'GET',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  })
+  response.json().then(data => {
+    if(response.status !== 200) throw new Error(`${data.error}`)
+    console.log(data)
+    if(data.status == "success") {
+      return window.location.href = "../index.php"
+    } else {
+      return false
+    }
+  }).catch((err) => {
+    console.error(err)
+  })
+}
 });
 //Course Click >> Course Details
 selectedCourse.addEventListener("click", function (e) {

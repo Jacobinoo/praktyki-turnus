@@ -57,19 +57,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 elseif($_SERVER["REQUEST_METHOD"] == "GET") {
-    switch ($_GET) {
-        //TODO
-    }
-    if(isset($_GET['checkAuth'])) {
-        if(isset($_SESSION['isLoggedIn']) && $_SESSION['isLoggedIn'] == true) {
-            echo json_encode([
-                "isAuthenticated" => true
-            ]);
-        } else {
-            echo json_encode([
-                "isAuthenticated" => false
-            ]);
-        }
+    switch ($_GET['']) {
+        case 'fetchCourses':
+            echo "courses";
+            break;
     }
     if(isset($_GET['checkAuth'])) {
         if(isset($_SESSION['isLoggedIn']) && $_SESSION['isLoggedIn'] == true) {

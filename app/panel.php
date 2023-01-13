@@ -69,16 +69,6 @@ if(!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] !== true) {
         </div>
       </div>
       <div id="content">
-        <div class="course" data-id="testId">
-          <span class="course-name">
-            Monter zabudowy i robót wykończeniowych w budownictwie</span
-          >
-          <div class="squares">
-            <div class="code">192345</div>
-            <div class="date">23.12.2022 - 10.01.2023</div>
-            <div class="status"><span class="status-text">Aktywny</span></div>
-          </div>
-        </div>
       </div>
     </div>
   </body>

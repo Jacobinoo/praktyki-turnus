@@ -9,11 +9,11 @@ document.querySelector('.login-btn').addEventListener('click', function () {
   document.querySelectorAll('.code-input').forEach(input => {
     code += input.value
   });
-  sendLoginCode(code)
+  logIn(code)
 })
 
-async function sendLoginCode(code) {
-  const response = await fetch('http://localhost:80/praktyki-turnus/server/api.php', {
+async function logIn(code) {
+  const response = await fetch('http://localhost/praktyki-turnus/server/api/login/', {
     method: 'POST',
     headers: {
       'Accept': 'application/json',

@@ -138,9 +138,8 @@ body {
 	text-align: center;
 }
 .last-line-description {
-	
-	margin-top: 2pt;
 	width: 100%;
+	margin-top: 2pt;
 	justify-content: center;
 }
 .certificate-description {
@@ -209,7 +208,7 @@ body {
 	text-align: center;
 }
 .footer {
-	margin-top: 150pt;
+	margin-top: 190pt;
 }
 .line {
 	border-bottom: 1px solid black;

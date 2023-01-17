@@ -98,18 +98,13 @@ $mpdf->WriteHTML('<div class="container">
         <div class="dots3">'.$range.'</div>
     </div>
     <div class="row-div">
-        <div class="dots4"></div>
-    </div>
-    <div class="row-div">
         <div style="width: 68pt;float: left;">prowadzony przez</div>
         <div class="dots5">'.$school.'</div>
-    </div>
-    <div class="row-div">
-        <div class="dots6"></div>
-    </div>
+    
     <div class="last-line-description" style="text-align: center">
         <div class="place-information" style="text-align: center">
             (nazwa i adres szkoły lub centrum kształcenia zawodowego)
+        </div>
         </div>
     </div>
     <div class="certificate-description">

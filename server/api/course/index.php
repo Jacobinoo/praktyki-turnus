@@ -1,8 +1,10 @@
 <?php
+require_once '/xampp/htdocs/praktyki-turnus/server/vendor/autoload.php';
+use Ramsey\Uuid\Uuid;
 session_start();
 if(!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] == "") {
     echo json_encode([
-        'error' => 'You are not logged in.'
+        'error' => 'Nie jesteś zalogowany(a)'
     ]);
     return http_response_code(403);
 }
@@ -10,52 +12,46 @@ header('Access-Control-Allow-Origin: http://127.0.0.1');
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Headers: Content-Type');
 require_once '/xampp/htdocs/praktyki-turnus/server/connect.php';
-mysqli_report(MYSQLI_REPORT_STRICT);
+mysqli_report(MYSQLI_REPORT_OFF);
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!file_get_contents('php://input')) return http_response_code(504);
     $response_json = json_decode(file_get_contents('php://input'), true);
-    if(!isset($response_json['login_code']) || $response_json['login_code'] == "") {
+    if(!isset($response_json['course_code']) || !isset($response_json['course_name']) || !isset($response_json['course_class']) || !isset($response_json['start_date']) || !isset($response_json['end_date'])) {
         echo json_encode([
-            'error' => 'Invalid login code'
+            'error' => 'Wszystkie pola muszą być wypełnione'
+        ]);
+        return http_response_code(500);
+    }
+    if($response_json['course_code'] == "" || $response_json['course_name'] == "" || $response_json['course_class'] == "" || $response_json['start_date'] == "" || $response_json['end_date'] == ""){
+        echo json_encode([
+            'error' => 'Wszystkie pola muszą być wypełnione'
+        ]);
+        return http_response_code(500);
+    }
+    if(strlen($response_json['course_code']) != 6) {
+        echo json_encode([
+            'error' => 'Kod zawodu musi mieć 6 cyfr'
         ]);
         return http_response_code(500);
     }
     else {
-        $login_code = $response_json['login_code'];
-        if(strlen($login_code) !== 6) {
+            $connection = @new mysqli($hostname, $username, $password, $dbname);
+            if ($connection->connect_error) {
+                echo json_encode([
+                    'error' => 'Nie można połączyć się z serwerem bazy danych'
+                ]);
+                return http_response_code(500);
+            }
+            $uuid = Uuid::uuid4();
+            $query = $connection->prepare("INSERT INTO courses (uuid, code, name, class, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?);");
+            $query->bind_param("sissss", $uuid, $response_json['course_code'], $response_json['course_name'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
+            $query->execute();
             echo json_encode([
-                'error' => 'Invalid login code'
+                'status' => 'success',
+                'uuid'=> $uuid
             ]);
-            return http_response_code(500);
-        }
-            $connection = new mysqli($hostname, $username, $password, $dbname);
-            if (!$connection) {
-                die(json_encode(["error"=>mysqli_connect_error()]));
-            }
-            $query = $connection->prepare("SELECT login_code FROM code WHERE login_code = ? LIMIT 1");
-            $login_code = $login_code;
-            $query->bind_param("s", $login_code);
-            $query->execute();
-            $query->store_result();
-            $rows = $query->num_rows;
-
-            $query->execute();
-            $result = $query->get_result();
-            $code = $result->fetch_assoc();
             $connection->close();
-            if($rows<1) {
-                echo json_encode([
-                    'error' => 'Login code is invalid'
-                ]);
-                return http_response_code(401);
-            } else {
-                $_SESSION['isLoggedIn'] = true;
-                echo json_encode([
-                    "status" => "success",
-                    "desc" => "Session established. Logging in."
-                ]);
-            }
     }
 }
 elseif($_SERVER["REQUEST_METHOD"] == "GET") {
@@ -83,29 +79,24 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
                 "course" => $result
             ]);
         }
-        return http_response_code(501);
     } elseif(!isset($_GET['id']) || $_GET['id'] == "") {
         //Fetch all courses
-        $connection = new mysqli($hostname, $username, $password, $dbname);
-        if (!$connection) {
-            die(json_encode(["error"=>mysqli_connect_error()]));
-        }
-        $query = $connection->prepare("SELECT * FROM courses");
-        $query->execute();
-        $query->store_result();
-        $rows = $query->num_rows;
-
-        $query->execute();
-        $result = $query->get_result()->fetch_assoc();
-        $connection->close();
-        if($rows<1) {
-            echo json_encode([]);
-        } else {
+        $connection = @new mysqli($hostname, $username, $password, $dbname);
+        if ($connection->connect_error) {
             echo json_encode([
-                "status" => "success",
-                "courses" => Array($result)
+                'error' => 'Nie można połączyć się z serwerem bazy danych'
             ]);
+            return http_response_code(500);
         }
+        $query = $connection->prepare("SELECT * FROM courses ORDER BY name ASC");
+        $query->execute();
+        $result = $query->get_result();
+        $result = $result->fetch_all(MYSQLI_ASSOC);
+        $connection->close();
+        echo json_encode([
+            "status" => "success",
+            "courses" => $result
+        ]);
     }
 }
 elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {

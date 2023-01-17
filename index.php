@@ -36,6 +36,8 @@ if(isset($_SESSION['isLoggedIn']) && $_SESSION['isLoggedIn'] == true) {
                 <input type="phone" class="code-input" maxlength="1" />
                 <input type="phone" class="code-input" maxlength="1" />
             </div>
+            <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+            <span style="display: none;" id="error-label"></span>
             <button class="login-btn">Zaloguj się</button>
         </div>
     </div>

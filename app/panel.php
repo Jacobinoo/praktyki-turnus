@@ -69,6 +69,9 @@ if(!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] !== true) {
         </div>
       </div>
       <div id="content">
+      <div class="lds-ring" style="display: inline-block; margin-top: 50px;"><div></div><div></div><div></div><div></div></div>
+      <span id="empty-label">Brak turnusów</span>
+        <span style="display: none;" id="error-label"></span>
       </div>
     </div>
   </body>

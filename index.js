@@ -4,6 +4,10 @@ $('input').val("")
 $('input:first').focus()
 })
 
+const loginBtn = document.querySelector('.login-btn')
+const errMsg = document.querySelector('#error-label')
+const loadingRing = document.querySelector('.lds-ring')
+
 document.querySelector('.login-btn').addEventListener('click', function () {
   let code = ""
   document.querySelectorAll('.code-input').forEach(input => {
@@ -13,6 +17,9 @@ document.querySelector('.login-btn').addEventListener('click', function () {
 })
 
 async function logIn(code) {
+  if(errMsg.textContent !== "") errMsg.textContent = ""
+  loginBtn.style.display = "none"
+  loadingRing.style.display = "inline-block"
   const response = await fetch('http://localhost/praktyki-turnus/server/api/login/', {
     method: 'POST',
     headers: {
@@ -22,11 +29,15 @@ async function logIn(code) {
     body: `{"login_code": "${code}"}`
   })
   response.json().then(data => {
-    if(response.status !== 200) throw new Error(`${data.error}`)
+    if(response.status !== 200) throw `${data.error}`
     console.log(data)
     window.location.href = "./app/panel.php"
   }).catch((err) => {
     console.error(err)
+    loginBtn.style.display = "flex"
+    loadingRing.style.display = "none"
+    errMsg.textContent = `${err}`
+    errMsg.style.display = "block"
   })
 }
 

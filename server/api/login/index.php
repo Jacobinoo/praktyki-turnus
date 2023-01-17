@@ -11,7 +11,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $response_json = json_decode(file_get_contents('php://input'), true);
     if(!isset($response_json['login_code']) || $response_json['login_code'] == "") {
         echo json_encode([
-            'error' => 'Invalid login code'
+            'error' => 'Nieprawidłowy kod logowania'
         ]);
         return http_response_code(500);
     }
@@ -19,14 +19,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $login_code = $response_json['login_code'];
         if(strlen($login_code) !== 6) {
             echo json_encode([
-                'error' => 'Invalid login code'
+                'error' => 'Nieprawidłowy kod logowania'
             ]);
             return http_response_code(500);
         }
-            mysqli_report(MYSQLI_REPORT_STRICT);
-            $connection = new mysqli($hostname, $username, $password, $dbname);
-            if (!$connection) {
-                die("Connection failed: " . mysqli_connect_error());
+            mysqli_report(MYSQLI_REPORT_OFF);
+            $connection = @new mysqli($hostname, $username, $password, $dbname);
+            if ($connection->connect_error) {
+                echo json_encode([
+                    'error' => 'Nie można połączyć się z serwerem bazy danych'
+                ]);
+                return http_response_code(500);
             }
             $query = $connection->prepare("SELECT login_code FROM code WHERE login_code = ? LIMIT 1");
             $login_code = $login_code;
@@ -41,14 +44,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             $connection->close();
             if($rows<1) {
                 echo json_encode([
-                    'error' => 'Login code is invalid'
+                    'error' => 'Nieprawidłowy kod logowania'
                 ]);
                 return http_response_code(401);
             } else {
                 $_SESSION['isLoggedIn'] = true;
                 echo json_encode([
                     "status" => "success",
-                    "desc" => "Session established. Logging in."
+                    "desc" => "Sesja ustanowiona. Logowanie..."
                 ]);
             }
     }

@@ -5,9 +5,9 @@ export function newCourseForm() {
 <div class="new-course-form-content">
   <h3 class="new-course-form-content-section-title">Informacje podstawowe</h3>
   <div class="new-course-form-content-info-wrapper">
-    <input type="phone" maxlength="6" placeholder="Kod zawodu" class="new-course-form-content-input">
-    <input type="text" placeholder="Nazwa zawodu" class="new-course-form-content-input">
-    <input type="text" placeholder="Klasa (np. IV)" class="new-course-form-content-input">
+    <input type="phone" maxlength="6" placeholder="Kod zawodu" class="new-course-form-content-input" id="code">
+    <input type="text" placeholder="Nazwa zawodu" class="new-course-form-content-input" id="name">
+    <input type="text" placeholder="Klasa (np. IV)" class="new-course-form-content-input" id="class">
   </div>
   <h3 class="new-course-form-content-section-title">Termin realizacji</h3>
   <div class="new-course-form-content-date-wrapper">
@@ -16,17 +16,19 @@ export function newCourseForm() {
     <label for="range-to">Data zakończenia</label>
     <input id="range-to" type="date" class="new-course-form-content-date-input">
   </div>
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  <span style="display: none;" id="error-label"></span>
   <div class="add-course-btn">Dodaj turnus</div>
 </div>`
 }
-export function renderCourseDetailsView(courseId) {
+export function renderCourseDetailsView(courseData) {
   return `
     <div class="course-details-header">
     <div class="course-details-header-wrapper">
-      Monter zabudowy i robót wykończeniowych w budownictwie
+      ${courseData.name}
       <div class="course-details-header-squares">
-      <span>Kod: <b>123456</b></span>
-      <span>Termin: <b>02.11.2022 - 30.11.2022</b></span>
+      <span>Kod: <b>${courseData.code}</b></span>
+      <span>Termin: <b>${courseData.startDate} - ${courseData.endDate}</b></span>
       <span>Status: <b>Aktywny</b></span>
       </div>
     </div>
@@ -95,6 +97,8 @@ export function renderCourseDetailsView(courseId) {
         <input type="text" id="current-house-place" placeholder="Adres zamieszkania">
         <input type="email" id="email" placeholder="Adres e-mail">
         <div class="new-participant-form-add-btn">Dodaj ucznia</div>
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        <span style="display: none;" id="error-label"></span>
         </div>`
     }
     function gradesTable(){

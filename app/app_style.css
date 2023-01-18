@@ -261,6 +261,16 @@ p {
   margin-top: 10px;
   margin-bottom: 10px;
 }
+textarea {
+  font-family: "Inter", sans-serif;
+  resize: vertical;
+  width: 300px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid gray;
+  font-size: 14px;
+  font-weight: 500;
+}
 ::placeholder {
   color: gray;
   opacity: 1;

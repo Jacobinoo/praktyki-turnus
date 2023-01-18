@@ -29,9 +29,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         ]);
         return http_response_code(500);
     }
-    if(strlen($response_json['course_code']) != 6) {
+    if(strlen($response_json['course_code']) > 6) {
         echo json_encode([
-            'error' => 'Kod zawodu musi mieć 6 cyfr'
+            'error' => 'Kod zawodu musi mieć nie więcej niż 6 cyfr'
         ]);
         return http_response_code(500);
     }

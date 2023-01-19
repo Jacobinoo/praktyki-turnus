@@ -20,6 +20,7 @@
   --link: rgb(130, 128, 255);
   --link-hover: rgba(130, 128, 255, 0.801);
   --error: rgb(255, 139, 139);
+  --hint: rgb(165, 165, 165);
 }
 body {
   margin: 0;
@@ -245,7 +246,18 @@ p {
     border-radius: 12px;
     padding: 15px;
     gap: 14px;
+    align-items: center;
   }
+h4 {
+  margin: 0;
+  margin-bottom: 18px;
+  color: var(--hint);
+  font-weight: 500;
+}
+.course-name-set {
+  color: var(--status-text-active);
+  font-weight: 600;
+}
 .new-course-form-content-input,
 .new-course-form-content-date-input {
   font-family: "Inter", sans-serif;
@@ -270,6 +282,8 @@ textarea {
   border: 1px solid gray;
   font-size: 14px;
   font-weight: 500;
+  min-height: 50px;
+  max-height: 100px;
 }
 ::placeholder {
   color: gray;
@@ -316,6 +330,126 @@ textarea {
     background-color: var(--btn-hover);
 }
 
+/*Add participant*/
+.new-participant-form {
+  width: 700px;
+  min-height: 650px;
+  background-color: white;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: default;
+  user-select: none;
+}
+.new-participant-form-header {
+  height: 35px;
+  padding: 22px;
+  background-color: rgb(100, 111, 212);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-weight: 600;
+  position: relative;
+  font-size: 20px;
+}
+.new-participant-form-header > svg {
+  font-size: 26px;
+  opacity: 0.7;
+  position: absolute;
+  right: 15px;
+  cursor: pointer;
+}
+.new-participant-form-header > svg:hover {
+  opacity: 1;
+}
+.new-participant-form-content {
+  padding: 25px;
+  padding-top: 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.new-participant-form-content-info-wrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(197, 202, 255);
+    border-radius: 12px;
+    padding: 15px;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+.new-participant-form-content-input,
+.new-participant-form-content-date-input {
+  font-family: "Inter", sans-serif;
+  width: 300px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid gray;
+  font-size: 14px;
+  font-weight: 500;
+}
+.new-participant-form-content-date-input {
+  color: gray;
+  margin-top: -5px;
+}
+textarea {
+  font-family: "Inter", sans-serif;
+  resize: vertical;
+  width: 300px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid gray;
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 50px;
+  max-height: 100px;
+}
+.new-participant-form-content-info-wrapper > label {
+    font-size: 14px;
+}
+.add-participant-btn {
+  height: auto;
+  width: auto;
+  background-color: var(--btn);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+.add-participant-btn:hover {
+    background-color: var(--btn-hover);
+}
+/*Error*/
+#error-label {
+  color: var(--error);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+#content > #error-label {
+  margin-top: 50px;
+}
+.add-course-btn {
+  height: auto;
+  width: auto;
+  background-color: var(--btn);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+}
+.add-course-btn:hover {
+    background-color: var(--btn-hover);
+}
+
+
+
+
+/*Course details*/
 .course-details {
     width: 80%;
     min-height: 700px;
@@ -432,7 +566,264 @@ b {
 .course-details-content-section-btn:hover {
   background-color: var(--btn-hover);
 }
-table {
+.course-details-add-grade-btn{
+  height: auto;
+  width: fit-content;
+  background-color: var(--card-bg);
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500
+}
+.course-details-add-grade-btn:hover{
+  background-color: var(--btn-hover);
+}
+
+/*Participant details*/
+.participant-details {
+    width: 80%;
+    min-height: 700px;
+    border-radius: 20px;
+    background-color: var(--card-bg);
+    padding-bottom: 25px;
+    overflow: hidden;
+    -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    box-shadow: 0px 0px 13px -1px var(--card-shadow);
+}
+.participant-details-header {
+    display: flex;
+    color: var(--card-bg);
+    background-color: white;
+    min-height: 40px;
+    padding: 25px;
+    font-size: 20px;
+    font-weight: 700;
+    color: black;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+.participant-details-header > svg {
+    display: flex;
+    flex-grow: 0;
+    flex-shrink: 0;
+    font-size: 26px;
+    cursor: pointer;
+    opacity: 0.7;
+    color: var(--card-bg);
+    position: absolute;
+    top: 25px;
+    right: 25px;
+}
+.participant-details-header > svg:hover {
+    opacity: 1;
+}
+.participant-details-header-wrapper {
+    display: flex;
+    gap: 7px;
+    flex-direction: column;
+    justify-content: center;
+    width: 90%;
+}
+.participant-details-header-squares {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 100%;
+}
+.participant-details-header-squares > span {
+    border-radius: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: 1px solid black;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.participant-details-content {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: 25px;
+    scrollbar-width: thin;
+    gap: 30px;
+}
+.participant-details-content-section {
+  background: white;
+  border-radius: 12px;
+  padding: 14px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.participant-details-content-section > h2 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 0px;
+}
+.participant-details-content-section > .btn {
+  border-radius: 100%;
+  width: 20px;
+  height: 20px;
+  background-color: var(--card-bg);
+}
+.participant-details-content-section-btn {
+  height: auto;
+  width: fit-content;
+  background-color: var(--card-bg);
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.participant-details-content-section-btn:hover {
+  background-color: var(--btn-hover);
+}
+.participant-details-add-grade-btn{
+  height: auto;
+  width: fit-content;
+  background-color: var(--card-bg);
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500
+}
+.participant-details-add-grade-btn:hover{
+  background-color: var(--btn-hover);
+}
+
+
+/*grade form*/
+.new-grade-form {
+  width: 700px;
+  min-height: 700px;
+  border-radius: 20px;
+  background-color: white;
+  padding-bottom: 25px;
+  overflow: hidden;
+  -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+  -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+  box-shadow: 0px 0px 13px -1px var(--card-shadow);
+}
+.new-grade-form-header {
+  display: flex;
+  color: white;
+  background-color: var(--card-bg);
+  min-height: 40px;
+  padding: 25px;
+  font-size: 20px;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.new-grade-form-header > svg {
+  display: flex;
+  flex-grow: 0;
+  flex-shrink: 0;
+  font-size: 26px;
+  cursor: pointer;
+  opacity: 0.7;
+  color: white;
+  position: absolute;
+  top: 25px;
+  right: 25px;
+}
+.new-grade-form-header > svg:hover {
+  opacity: 1;
+}
+.new-grade-form-header-wrapper {
+  display: flex;
+  gap: 7px;
+  flex-direction: column;
+  justify-content: center;
+  width: 90%;
+}
+.new-grade-form-content {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 25px;
+  scrollbar-width: thin;
+  gap: 30px;
+}
+.new-grade-form-content-section {
+background: white;
+border-radius: 12px;
+padding: 14px;
+overflow: auto;
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+.new-grade-form-content-section > h2 {
+display: flex;
+gap: 10px;
+align-items: center;
+margin-bottom: 0px;
+}
+.new-grade-form-content-section > .btn {
+border-radius: 100%;
+width: 20px;
+height: 20px;
+background-color: var(--card-bg);
+}
+.participant-details-content-snew-grade-form-btn {
+height: auto;
+width: fit-content;
+background-color: var(--card-bg);
+padding: 7px;
+padding-left: 12px;
+padding-right: 12px;
+border-radius: 8px;
+color: white;
+cursor: pointer;
+font-size: 14px;
+font-weight: 500;
+}
+.partic-content-snew-grade-form-btn:hover {
+background-color: var(--btn-hover);
+}
+.new-grade-form-add-grade-btn{
+height: auto;
+width: fit-content;
+background-color: var(--card-bg);
+padding: 7px;
+padding-left: 12px;
+padding-right: 12px;
+border-radius: 8px;
+color: white;
+cursor: pointer;
+font-size: 14px;
+font-weight: 500
+}
+.new-grade-form-add-grade-btn:hover{
+background-color: var(--btn-hover);
+}
+
+
+
+
+
+table  {
   width: 100%;
   background-color: #FFFFFF;
   border-collapse: collapse;
@@ -447,13 +838,13 @@ table td, table th {
   border-width: 2px;
   border-color: #7EA8F8;
   border-style: solid;
-  padding: 5px;
+  padding: 10px !important;
 }
 
 table thead {
   background-color: #7EA8F8;
 }
-a{
+.download-certificate-btn{
   text-decoration: none;
   color: white;
   width: 40px;
@@ -462,7 +853,7 @@ a{
   padding: 7px;
   border-radius: 10px;
 }
-a:hover{
+.download-certificate-btn:hover{
   background-color: var(--link-hover);
 }
 .participant-edit-icon {
@@ -475,50 +866,13 @@ a:hover{
 transform: scale(1.1);
 }
 
-
-
-
-
-
-
-.new-participant-form{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+.participant-grade-edit-icon{
+  font-size: 20px;
+  width: 100%;
+  transition: all 0.1s ease-in-out;
 }
-
-.new-participant-form > input{
-    font-family: "Inter", sans-serif;
-    width: 300px;
-    padding: 8px;
-    border-radius: 12px;
-    border: 1px solid gray;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 20px;
-  }
-  #birth-date{
-    color: gray;
-  }
-  .new-participant-form > h3{
-    text-align: center;
-    color: white;
-}
-.new-participant-form-add-btn{
-    height: auto;
-    width: 150px;
-    background-color: var(--btn);
-    border-radius: 20px;
-    padding: 5px;
-    text-align: center;
-    cursor: pointer;
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-}
-.new-participant-form-add-btn:hover{
-    background-color: var(--btn-hover);
+.participant-grade-edit-icon:hover{
+  transform: scale(1.1);
 }
 
 #empty-label {

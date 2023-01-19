@@ -17,13 +17,13 @@ mysqli_report(MYSQLI_REPORT_OFF);
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!file_get_contents('php://input')) return http_response_code(504);
     $response_json = json_decode(file_get_contents('php://input'), true);
-    if(!isset($response_json['course_code']) || !isset($response_json['course_name']) || !isset($response_json['course_class']) || !isset($response_json['start_date']) || !isset($response_json['end_date'])) {
+    if(!isset($response_json['course_code']) || !isset($response_json['course_class']) || !isset($response_json['start_date']) || !isset($response_json['end_date'])) {
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
         return http_response_code(500);
     }
-    if($response_json['course_code'] == "" || $response_json['course_name'] == "" || $response_json['course_class'] == "" || $response_json['start_date'] == "" || $response_json['end_date'] == ""){
+    if($response_json['course_code'] == "" || $response_json['course_class'] == "" || $response_json['start_date'] == "" || $response_json['end_date'] == ""){
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
@@ -44,8 +44,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 return http_response_code(500);
             }
             $uuid = Uuid::uuid4();
-            $query = $connection->prepare("INSERT INTO courses (uuid, code, name, class, start_date, end_date) VALUES (?, ?, ?, ?, ?, ?);");
-            $query->bind_param("sissss", $uuid, $response_json['course_code'], $response_json['course_name'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
+            $query = $connection->prepare("INSERT INTO courses (uuid, code, class, start_date, end_date) VALUES (?, ?, ?, ?, ?);");
+            $query->bind_param("sissss", $uuid, $response_json['course_code'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
             $query->execute();
             echo json_encode([
                 'status' => 'success',
@@ -88,7 +88,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
             ]);
             return http_response_code(500);
         }
-        $query = $connection->prepare("SELECT * FROM courses ORDER BY name ASC");
+        $query = $connection->prepare("SELECT * FROM courses ORDER BY code");
         $query->execute();
         $result = $query->get_result();
         $result = $result->fetch_all(MYSQLI_ASSOC);

@@ -1,8 +1,8 @@
 <?php
 require_once __DIR__ . '/vendor/autoload.php';
 $mpdf = new \Mpdf\Mpdf();
-$stylesheet = file_get_contents('style2.css');
-$html = file_get_contents('html2.html');
+$stylesheet = file_get_contents('zaswiadczenie_oceny.css');
+$html = file_get_contents('zaswiadczenie_oceny.html');
 
 
 $mpdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);

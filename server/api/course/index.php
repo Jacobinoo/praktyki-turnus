@@ -45,7 +45,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             $uuid = Uuid::uuid4();
             $query = $connection->prepare("INSERT INTO courses (uuid, code, class, start_date, end_date) VALUES (?, ?, ?, ?, ?);");
-            $query->bind_param("sissss", $uuid, $response_json['course_code'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
+            $query->bind_param("sisss", $uuid, $response_json['course_code'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
             $query->execute();
             echo json_encode([
                 'status' => 'success',
@@ -66,19 +66,30 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
         $query->bind_param("s", $courseId);
         $query->execute();
         $query->store_result();
-        $rows = $query->num_rows;
+        $rows_course = $query->num_rows;
 
         $query->execute();
-        $result = $query->get_result()->fetch_assoc();
-        $connection->close();
-        if($rows<1) {
+        if($rows_course < 1) {
+            $connection->close();
             echo json_encode([]);
-        } else {
-            echo json_encode([
-                "status" => "success",
-                "course" => $result
-            ]);
+            exit();
         }
+        $result_course = $query->get_result()->fetch_assoc();
+
+        //Participant table
+        $query = $connection->prepare("SELECT * FROM participants WHERE assigned_course = ?");
+        $query->bind_param("s", $courseId);
+        $query->execute();
+        $query->store_result();
+        $rows_participants = $query->num_rows;
+        $query->execute();
+        $result_participants = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+        $connection->close();
+        echo json_encode([
+            "status" => "success",
+            "course" => $result_course,
+            "participants" => $rows_participants<1 ? [] : $result_participants
+        ]);
     } elseif(!isset($_GET['id']) || $_GET['id'] == "") {
         //Fetch all courses
         $connection = @new mysqli($hostname, $username, $password, $dbname);

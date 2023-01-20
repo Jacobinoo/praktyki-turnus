@@ -10,8 +10,8 @@ if(!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] == "") {
 header('Access-Control-Allow-Origin: http://127.0.0.1');
 header('Access-Control-Allow-Headers: Content-Type');
 $mpdf = new \Mpdf\Mpdf();
-$stylesheet = file_get_contents('style.css');
-$html = file_get_contents('html.html');
+$stylesheet = file_get_contents('zaswiadczenie.css');
+$html = file_get_contents('zaswiadczenie.html');
 $mpdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);
 
 define("CURRENT_DATE_PLACE", "Staszów, ".date("d.m.Y"));

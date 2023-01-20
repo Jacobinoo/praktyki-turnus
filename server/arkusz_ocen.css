@@ -1,0 +1,32 @@
+body{
+    font-size: 10pt;
+}
+.place-date{
+    text-align: right;
+}
+h4{
+    text-align: center;
+}
+.range-date{
+    float: left;
+    width: 170pt;
+}
+.turnus-name{
+    float: left;
+    text-align: right;
+    margin-right: 30pt;
+}
+table{
+    width: 100%;
+    margin-top: 20pt;
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+td,th{
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+td{
+    width: 100pt;
+}

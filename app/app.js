@@ -9,13 +9,14 @@ const mainUI_List = document.querySelector("#container");
 const logoutBtn = document.querySelector(".logout-btn");
 
 let courseId = null;
+let participantId = null;
+let participantsData = null;
 let isCourseDetailsOpen = false
 let isAddCourseFormOpen = false
 let isAddParticipantFormOpen = false
 let isParticipantDetailsOpen = false
 let isAddGradeFormOpen = false
 let isEditGradeFormOpen = false
-
 
 //Curtain
 const curtain = document.querySelector(".curtain");
@@ -25,7 +26,6 @@ addBtn.addEventListener("click", function () {
   isAddCourseFormOpen = true
   UI_showNewCourseForm();
 });
-
 function UI_showNewCourseForm() {
   curtain.style.display = "flex";
   const form = document.createElement("div");
@@ -39,7 +39,7 @@ function UI_showNewCourseForm() {
       curtain.style.display = "none";
       form.remove();
     });
-    document.querySelector('#code').addEventListener('keyup', function (e) {
+    document.querySelector('#code').addEventListener('keyup', function () {
       let input = document.querySelector('#code').value
       try {
         if(kwalifikacje[input].name) {
@@ -71,10 +71,10 @@ function UI_showNewParticipantForm() {
     });
 }
 
-function UI_showNewGradeForm(){
+function UI_showNewGradeForm(isConductGrade = false){
   curtain.style.display = "flex";
   const form = document.createElement("div");
-  form.innerHTML = newGradeForm();
+  form.innerHTML = newGradeForm(isConductGrade);
   form.className = "new-grade-form";
   curtain.appendChild(form);
   form
@@ -120,6 +120,12 @@ logoutBtn.addEventListener("click", function () {
 //Add new course
 document.querySelector(".curtain").addEventListener("click", function (e) {
   if (!e.target.classList.contains("add-course-btn")) {
+    return;
+  }
+  if(document.querySelector('#name').className != "course-name-set") {
+    const errMsg = document.querySelector('#error-label')
+    errMsg.textContent = "Nieprawidłowy kod zawodu"
+    errMsg.style.display = "block"
     return;
   }
   createCourse(curtain.querySelector('#code').value, curtain.querySelector('#name').value, curtain.querySelector('#class').value, curtain.querySelector('#range-from').value, curtain.querySelector('#range-to').value).then(_ => {
@@ -230,6 +236,7 @@ function createCourseComponent(onTheTop = false, uuid, _class, code, startDate, 
   <div class="squares course-click-listener" data-id='${uuid}'>
     <div class="code course-click-listener" data-id='${uuid}'>${code}</div>
     <div class="date course-click-listener" data-id='${uuid}'>${startDate} - ${endDate}</div>
+    <div class="date course-click-listener" data-id='${uuid}'>Klasa ${_class}</div>
     <div class="status course-click-listener" data-id='${uuid}'><span class="status-text course-click-listener" data-id='${uuid}'>${
     status ? "Aktywny" : "Nieaktywny"
   }</span></div>
@@ -272,88 +279,42 @@ document.querySelector("body").addEventListener("click", function (e) {
   }
   if(isParticipantDetailsOpen == true) return;
   isParticipantDetailsOpen = true
+  participantId = e.target.dataset.id
   UI_redirectParticipantView()
 });
 
 //New grade button click
 document.querySelector("body").addEventListener("click", function (e) {
-  if (!e.target.classList.contains("participant-details-add-grade-btn")) {
-    return;
+  if(e.target.classList.contains("participant-details-add-grade-btn")) {
+    if(isAddGradeFormOpen == true) return;
+    isAddGradeFormOpen = true
+    UI_showNewGradeForm()
+  } else if (e.target.classList.contains("conduct-grade-btn")) {
+    if(isAddGradeFormOpen == true) return;
+    isAddGradeFormOpen = true
+    UI_showNewGradeForm(true)
   }
-  if(isAddGradeFormOpen == true) return;
-  isAddGradeFormOpen = true
-  UI_showNewGradeForm()
 });
 
 async function UI_redirectParticipantView() {
-  // let courseData = {}
+  console.log(`redirecting to participant ${participantId}`)
   const UI = document.createElement("div");
   UI.className = "participant-details";
-  const response = await fetch(
-    `http://localhost/praktyki-turnus/server/api/course/?id=${courseId}`,
-    {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    }
-  );
-  response
-    .json()
-    .then((data) => {
-      if (response.status !== 200) throw new Error(`${data.error}`);
-      if (data.status == "success") {
-          const startDateParts = data.course.start_date.split("-");
-          const startDate = new Date(
-            startDateParts[0],
-            startDateParts[1] - 1,
-            startDateParts[2].substr(0, 2)
-          ).toLocaleDateString("pl-pl", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-          });
-          const endDateParts = data.course.end_date.split("-");
-          const endDate = new Date(
-            endDateParts[0],
-            endDateParts[1] - 1,
-            endDateParts[2].substr(0, 2)
-          ).toLocaleDateString("pl-pl", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-          });
-          // courseData = {
-          //   uuid:data.course.uuid,
-          //   name:data.course.name,
-          //   code:data.course.code,
-          //   class:data.course.class,
-          //   startDate:startDate,
-          //   endDate:endDate
-          // }
-          UI.innerHTML = renderParticipantDetailsView()
-          mainUI_List.style.display = "none";
-          body.appendChild(UI);
-          document.querySelector('.course-details').style.display = "none"
-          UI.querySelector(".bi-x-circle-fill").addEventListener("click", function () {
-            isParticipantDetailsOpen = false
-            UI.remove()
-            document.querySelector('.course-details').style.display = "block"
-          });
-      } else {
-        throw new Error(`${data.error}`);
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-    });
+  UI.innerHTML = renderParticipantDetailsView(participantsData.find(x => x.uuid == participantId))
+  mainUI_List.style.display = "none";
+  body.appendChild(UI);
+  document.querySelector(".conduct-grade").innerText == "" ? document.querySelector(".conduct-grade-btn").innerText = "Dodaj" : document.querySelector(".conduct-grade-btn").innerText = "Zmień"
+  document.querySelector('.course-details').style.display = "none"
+  UI.querySelector(".bi-x-circle-fill").addEventListener("click", function () {
+    isParticipantDetailsOpen = false
+    UI.remove()
+    document.querySelector('.course-details').style.display = "block"
+  });
 }
 
 
 
 async function UI_redirectDetailsView() {
-  document.querySelector('.course-det')
   let courseData = {}
   const UI = document.createElement("div");
   UI.className = "course-details";
@@ -398,11 +359,14 @@ async function UI_redirectDetailsView() {
             code:data.course.code,
             class:data.course.class,
             startDate:startDate,
-            endDate:endDate
+            endDate:endDate,
+            participants: data.participants
           }
           UI.innerHTML = renderCourseDetailsView(courseData);
           mainUI_List.style.display = "none";
+          participantsData = courseData.participants
           body.appendChild(UI);
+          console.log(participantsData)
           UI.querySelector(".bi-x-circle-fill").addEventListener("click", function () {
             isCourseDetailsOpen = false
             UI.remove()

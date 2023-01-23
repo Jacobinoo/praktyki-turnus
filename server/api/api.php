@@ -33,7 +33,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             $query = $connection->prepare("SELECT login_code FROM code WHERE login_code = ? LIMIT 1");
             $login_code = $login_code;
-            $query->bind_param("s", $login_code);
+            $query->("s", $login_code);
             $query->execute();
             $query->store_result();
             $rows = $query->num_rows;

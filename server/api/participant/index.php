@@ -15,13 +15,13 @@ require_once '/xampp/htdocs/praktyki-turnus/server/connect.php';
 mysqli_report(MYSQLI_REPORT_OFF);
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(!file_get_contents('php://input')) return http_response_code(504);
+    if(!file_get_contents('php://input')) return http_response_code(400);
     $response_json = json_decode(file_get_contents('php://input'), true);
     if(!isset($response_json['full_name']) || !isset($response_json['birth_date']) || !isset($response_json['birth_place']) || !isset($response_json['pesel']) || !isset($response_json['school_id']) || !isset($response_json['address']) || !isset($response_json['email']) || !isset($response_json['assigned_course'])) {
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
-        return http_response_code(500);
+        return http_response_code(400);
     }
     if($response_json['full_name'] == "" || $response_json['birth_date'] == "" || $response_json['birth_place'] == "" || $response_json['pesel'] == "" || $response_json['school_id'] == "" || $response_json['address'] == "" || $response_json['email'] == "" || $response_json['assigned_course'] == ""){
         echo json_encode([
@@ -44,13 +44,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             return http_response_code(500);
         }
         $uuid = Uuid::uuid4();
-        $query = $connection->prepare("INSERT INTO courses (uuid, code, class, start_date, end_date) VALUES (?, ?, ?, ?, ?);");
-        $query->bind_param("sissss", $uuid, $response_json['course_code'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
-        $query->execute();
-        echo json_encode([
-            'status' => 'success',
-            'uuid'=> $uuid
-        ]);
+        $query = $connection->prepare("INSERT INTO participants (uuid, full_name, birth_date, birth_place, pesel, school_id, address, email, assigned_course) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+        $query->bind_param("sssssisss", $uuid, $response_json['full_name'], $response_json['birth_date'], $response_json['birth_place'], $response_json['pesel'], $response_json['school_id'], $response_json['address'], $response_json['email'], $response_json['assigned_course']);
+        if($query->execute()) {
+            echo json_encode([
+                'status' => 'success',
+                'uuid'=> $uuid
+            ]);
+        } else {
+            echo json_encode([
+                'status' => 'error',
+                'error'=> 'Wystąpił błąd przy dodawaniu ucznia'
+            ]);
+        }
         $connection->close();
     }
 }

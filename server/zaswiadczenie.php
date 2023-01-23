@@ -7,11 +7,22 @@ if(!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] == "") {
     ]);
     return http_response_code(403);
 }
+if(!isset($_GET['id']) || !isset($_GET['p']) || !isset($_GET['name'])) {
+    http_response_code(400);
+    exit('{"error": "Bad Request 400"}');
+}
+if($_GET['id'] == "" || $_GET['p'] == "" || $_GET['name'] == "") {
+    http_response_code(400);
+    exit('{"error": "Bad Request 400"}');
+}
+$uuid = $_GET['id'];
+$pesel = $_GET['p'];
+$course_name = $_GET['name'];
+require_once '/xampp/htdocs/praktyki-turnus/server/connect.php';
 header('Access-Control-Allow-Origin: http://127.0.0.1');
 header('Access-Control-Allow-Headers: Content-Type');
 $mpdf = new \Mpdf\Mpdf();
 $stylesheet = file_get_contents('zaswiadczenie.css');
-$html = file_get_contents('zaswiadczenie.html');
 $mpdf->WriteHTML($stylesheet,\Mpdf\HTMLParserMode::HEADER_CSS);
 
 define("CURRENT_DATE_PLACE", "Staszów, ".date("d.m.Y"));
@@ -19,34 +30,60 @@ define("CURRENT_DATE_PLACE", "Staszów, ".date("d.m.Y"));
 $year = date('Y');
 $year = $year[-2].$year[-1];
 
-
-if($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(!file_get_contents('php://input')) return http_response_code(400);
-    $request = json_decode(file_get_contents('php://input'), true);
-
-    if(!isset($request['names_surname']) || !isset($request['birth_date']) || !isset($request['birth_place']) || !isset($request['pesel']) || !isset($request['course_name']) || !isset($request['course_code']) || !isset($request['range']) || !isset($request['school'])) {
-        echo json_encode([
-            'error' => 'Nie podano wystarczająco danych'
-        ]);
-        return http_response_code(400);
+if($_SERVER["REQUEST_METHOD"] == "GET") {
+    $connection = new mysqli($hostname, $username, $password, $dbname);
+    if (!$connection) {
+        die(json_encode(["error"=>mysqli_connect_error()]));
     }
-    if($request['names_surname'] == "" || $request['birth_date'] == "" || $request['birth_place'] == "" || $request['pesel'] == "" || $request['course_name'] == "" || $request['course_code'] == "" || $request['range'] == "" || $request['school'] == "") {
-        echo json_encode([
-            'error' => 'Dane nie mogą być puste'
-        ]);
-        return http_response_code(400);
+    $query = $connection->prepare("SELECT * FROM participants WHERE uuid = ? AND pesel = ?");
+    $query->bind_param("ss", $uuid, $pesel);
+    $query->execute();
+    $query->store_result();
+    $rows = $query->num_rows;
+    $query->execute();
+    if($rows < 1) {
+        $connection->close();
+        http_response_code(500);
+        exit('{"error": "Nie znaleziono ucznia"}');
     }
+    $result_participant = $query->get_result()->fetch_assoc();
 
-    $names_surname = $request['names_surname'];
-    $birth_date = $request['birth_date'];
-    $birth_place = $request['birth_place'];
-    $pesel = $request['pesel'];
-    $course_name = $request['course_name'];
-    $course_code = $request['course_code'];
-    $range = $request['range'];
-    $school = $request['school'];
-    $nr = $request['nr'];
-}
+    //Course data
+    $query = $connection->prepare("SELECT * FROM courses WHERE uuid = ?");
+    $query->bind_param("s", $result_participant['assigned_course']);
+    $query->execute();
+    $query->store_result();
+    $rows = $query->num_rows;
+    $query->execute();
+    if($rows < 1) {
+        $connection->close();
+        http_response_code(500);
+        exit('{"error": "Turnus przypisany do ucznia nie został znaleziony"}');
+    }
+    $result_course = $query->get_result()->fetch_assoc();
+
+    //School list
+    $query = $connection->prepare("SELECT * FROM schools WHERE id = ?");
+    $query->bind_param("s", $result_participant['school_id']);
+    $query->execute();
+    $query->store_result();
+    $rows = $query->num_rows;
+    $query->execute();
+    if($rows < 1) {
+        $school = "Błąd - nieznana szkoła ~ nie istnieje w bazie danych";
+    }
+    $result_school = $query->get_result()->fetch_assoc();
+    $connection->close();
+
+
+    $names_surname = $result_participant['full_name'];
+    $birth_date = date("d.m.Y", strtotime($result_participant['birth_date']));
+    $birth_place = $result_participant['birth_place'];
+    $pesel = $result_participant['pesel'];
+    $course_code = $result_course['code'];
+    $range = "klasa {$result_course['class']}";
+    $school = $result_school['address'];
+    $nr = "";
 
 $mpdf->WriteHTML('<div class="container">
 <div class="stump-box">
@@ -159,5 +196,19 @@ $mpdf->WriteHTML('<div class="container">
     </div>
 </div>
 </div>',\Mpdf\HTMLParserMode::HTML_BODY);
-$mpdf->OutputHttpDownload('download.pdf');
-//$mpdf->Output();
+//$mpdf->OutputHttpDownload('download.pdf');
+ob_clean();
+$mpdf->Output();
+}
+elseif($_SERVER["REQUEST_METHOD"] == "POST") {
+    return http_response_code(501);
+}
+elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
+    return http_response_code(501);
+}
+elseif($_SERVER["REQUEST_METHOD"] == "PUT") {
+    return http_response_code(501);
+}
+elseif($_SERVER["REQUEST_METHOD"] == "PATCH") {
+    return http_response_code(501);
+}

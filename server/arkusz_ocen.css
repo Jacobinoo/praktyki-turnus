@@ -26,7 +26,9 @@ table{
 td,th{
     border: 1px solid black;
     border-collapse: collapse;
+    padding: 5pt;
+    text-align: center;
 }
 td{
-    width: 100pt;
+    max-width: 100pt;
 }

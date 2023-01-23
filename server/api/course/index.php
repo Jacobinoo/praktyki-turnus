@@ -45,7 +45,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             $uuid = Uuid::uuid4();
             $query = $connection->prepare("INSERT INTO courses (uuid, code, class, start_date, end_date) VALUES (?, ?, ?, ?, ?);");
-            $query->bind_param("sisss", $uuid, $response_json['course_code'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
+            $query->bind_param("sssss", $uuid, $response_json['course_code'], $response_json['course_class'], $response_json['start_date'], $response_json['end_date']);
             $query->execute();
             echo json_encode([
                 'status' => 'success',
@@ -77,18 +77,24 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
         $result_course = $query->get_result()->fetch_assoc();
 
         //Participant table
-        $query = $connection->prepare("SELECT * FROM participants WHERE assigned_course = ?");
+        $query = $connection->prepare("SELECT * FROM participants WHERE assigned_course = ? ORDER BY full_name ASC");
         $query->bind_param("s", $courseId);
         $query->execute();
         $query->store_result();
         $rows_participants = $query->num_rows;
         $query->execute();
         $result_participants = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        // Schools table
+        // $query = $connection->prepare("SELECT * FROM schools ORDER BY name ASC");
+        // $query->execute();
+        // $result_schools = $query->get_result()->fetch_all(MYSQLI_ASSOC);
         $connection->close();
         echo json_encode([
             "status" => "success",
             "course" => $result_course,
-            "participants" => $rows_participants<1 ? [] : $result_participants
+            "participants" => $rows_participants<1 ? [] : $result_participants,
+            //"schools" => $result_schools
         ]);
     } elseif(!isset($_GET['id']) || $_GET['id'] == "") {
         //Fetch all courses

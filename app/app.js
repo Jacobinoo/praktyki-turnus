@@ -1,4 +1,4 @@
-import { newCourseForm, newParticipantForm, renderCourseDetailsView, renderParticipantDetailsView, newGradeForm } from "./functions.js";
+import { newCourseForm, newParticipantForm, renderCourseDetailsView, renderParticipantDetailsView, newGradeForm, editGradeForm, schoolList, newSchoolForm} from "./functions.js";
 
 //Kwalifikacje - symbole cyfrowe JSON
 import kwalifikacje from './kwalifikacje.js'
@@ -17,9 +17,101 @@ let isAddParticipantFormOpen = false
 let isParticipantDetailsOpen = false
 let isAddGradeFormOpen = false
 let isEditGradeFormOpen = false
+let schoolsList = [{}]
+let allowMeToCheckSchoolList = false
+let addSchoolFormOpen = false
+
+
+fetchSchools()
+async function fetchSchools() {
+  const response = await fetch(
+    "http://localhost/praktyki-turnus/server/api/schools/",
+    {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  response
+    .json()
+    .then(data => {
+      if (response.status !== 200) throw `${data.error}`;
+      if (data.status == "success") {
+        schoolsList = data.schools
+        console.log(schoolsList)
+        allowMeToCheckSchoolList = true
+      } else {
+        throw `${data.error}`;
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+}
+
+
+
+
 
 //Curtain
 const curtain = document.querySelector(".curtain");
+//School list
+document.querySelector(".school-btn").addEventListener("click", function(e){
+  return UI_showSchoolList()
+});
+
+//school list
+function UI_showSchoolList(){
+  if(allowMeToCheckSchoolList != true) {
+    return;
+  }
+  curtain.style.display = "flex";
+  const form = document.createElement("div");
+  form.innerHTML = schoolList(schoolsList);
+  form.className = "school-list";
+  curtain.appendChild(form);
+  form
+    .querySelector(".bi-x-circle-fill")
+    .addEventListener("click", function () {
+      curtain.style.display = "none";
+      form.remove();
+    });
+}
+//New school form
+function UI_showNewSchoolForm(){
+  curtain.style.display = "flex";
+  const form = document.createElement("div");
+  form.innerHTML = newSchoolForm();
+  form.className = "new-school-form";
+  curtain.appendChild(form);
+  form
+    .querySelector(".bi-x-circle-fill")
+    .addEventListener("click", function () {
+      curtain.style.display = "none";
+      form.remove();
+    });
+}
+
+document.querySelector('body').addEventListener("click", function(e){
+  if(!e.target.classList.contains('add-school-btn')) {
+    return
+  } 
+  document.querySelector('.school-list').style.display = "none"
+  return UI_showNewSchoolForm();
+})
+
+
+document.querySelector('body').addEventListener("click", function(e){
+  if(!e.target.classList.contains('download-certificate-btn')) {
+    return
+  }
+  return window.open(`http://localhost/praktyki-turnus/server/zaswiadczenie.php?id=${e.target.dataset.id}&p=${e.target.dataset.p}&name=${e.target.dataset.name}`,'_blank')
+})
+
+
+
 //New Course Form
 addBtn.addEventListener("click", function () {
   if(isAddCourseFormOpen == true) return;
@@ -59,7 +151,7 @@ function UI_showNewCourseForm() {
 function UI_showNewParticipantForm() {
   curtain.style.display = "flex";
   const form = document.createElement("div");
-  form.innerHTML = newParticipantForm();
+  form.innerHTML = newParticipantForm(schoolsList);
   form.className = "new-participant-form";
   curtain.appendChild(form);
   form
@@ -85,6 +177,22 @@ function UI_showNewGradeForm(isConductGrade = false){
       form.remove();
     });
 }
+
+function UI_showEditGradeForm(){
+  curtain.style.display = "flex";
+  const form = document.createElement("div");
+  form.innerHTML = editGradeForm();
+  form.className = "edit-grade-form";
+  curtain.appendChild(form);
+  form
+    .querySelector(".bi-x-circle-fill")
+    .addEventListener("click", function () {
+      curtain.style.display = "none";
+      form.remove();
+    });
+}
+
+
 
 //Logout Btn
 logoutBtn.addEventListener("click", function () {
@@ -116,6 +224,8 @@ logoutBtn.addEventListener("click", function () {
       });
   }
 });
+
+
 
 //Add new course
 document.querySelector(".curtain").addEventListener("click", function (e) {
@@ -250,6 +360,7 @@ function createCourseComponent(onTheTop = false, uuid, _class, code, startDate, 
   }
 }
 
+
 //Course Click >> Course Details
 document.querySelector("#content").addEventListener("click", function (e) {
   if (!e.target.classList.contains("course-click-listener")) {
@@ -271,6 +382,58 @@ document.querySelector("body").addEventListener("click", function (e) {
   isAddParticipantFormOpen = true
   UI_showNewParticipantForm()
 });
+
+
+//send new participant btn click
+document.querySelector("body").addEventListener("click", function (e) {
+  if (!e.target.classList.contains("add-participant-btn")) {
+    return;
+  }
+  createParticipant(document.querySelector('#fullname').value, document.querySelector('#birthplace').value, document.querySelector('#pesel').value, document.querySelector('#email').value, document.querySelector('#address').value, document.querySelector('#schoolid').value, document.querySelector('#birthdate').value, courseId)
+});
+
+async function createParticipant(full_name, birth_place, pesel, email, address, school_id, birth_date, assigned_course) {
+  const addBtn = document.querySelector('.add-participant-btn')
+  const errMsg = document.querySelector('.new-participant-form-content > #error-label')
+  const loadingRing = document.querySelector('.new-participant-form-content > .lds-ring')
+  if(errMsg.textContent !== "") errMsg.textContent = ""
+  addBtn.style.display = "none"
+  loadingRing.style.display = "inline-block"
+  const response = await fetch(
+    "http://localhost/praktyki-turnus/server/api/participant/",
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: `{"full_name": "${full_name}","birth_date": "${birth_date}","birth_place": "${birth_place}","pesel": "${pesel}","school_id": "${school_id}","address":"${address}", "email":"${email}", "assigned_course":"${assigned_course}"}`,
+    }
+  );
+  response
+    .json()
+    .then((data) => {
+      if (response.status !== 200) throw `${data.error}`;
+      if (data.status == "success") {
+        console.log(`New participant uuid: ${data.uuid}`)
+        document.querySelector('.course-details').remove()
+        UI_redirectDetailsView()
+        curtain.style.display = "none"
+        curtain.replaceChildren()
+        isAddParticipantFormOpen = false
+      } else {
+        throw `${data.error}`;
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      addBtn.style.display = "flex"
+      loadingRing.style.display = "none"
+      errMsg.textContent = `${err}`
+      errMsg.style.display = "block"
+    });
+}
+
 
 //Edit participant button click
 document.querySelector("body").addEventListener("click", function (e) {
@@ -296,11 +459,21 @@ document.querySelector("body").addEventListener("click", function (e) {
   }
 });
 
+//Edit grade button
+document.querySelector("body").addEventListener("click", function (e) {
+  if(e.target.classList.contains("edit-grade-btn")) {
+    return UI_showEditGradeForm()
+  }
+  if(e.target.classList.contains("participant-grade-edit-icon")){
+    return UI_showEditGradeForm()
+  }
+});
+
 async function UI_redirectParticipantView() {
   console.log(`redirecting to participant ${participantId}`)
   const UI = document.createElement("div");
   UI.className = "participant-details";
-  UI.innerHTML = renderParticipantDetailsView(participantsData.find(x => x.uuid == participantId))
+  UI.innerHTML = renderParticipantDetailsView(participantsData.find(x => x.uuid == participantId), schoolsList)
   mainUI_List.style.display = "none";
   body.appendChild(UI);
   document.querySelector(".conduct-grade").innerText == "" ? document.querySelector(".conduct-grade-btn").innerText = "Dodaj" : document.querySelector(".conduct-grade-btn").innerText = "Zmień"
@@ -360,7 +533,8 @@ async function UI_redirectDetailsView() {
             class:data.course.class,
             startDate:startDate,
             endDate:endDate,
-            participants: data.participants
+            participants: data.participants,
+            schools: schoolsList
           }
           UI.innerHTML = renderCourseDetailsView(courseData);
           mainUI_List.style.display = "none";

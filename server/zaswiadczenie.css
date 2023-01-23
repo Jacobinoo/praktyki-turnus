@@ -161,12 +161,14 @@ body {
 }
 .nr-text{
 	float: left;
+	margin-right: 10pt;
 	width: 14.89pt;
 	text-align: center;
 }
 .nr-dots{
 	float: left;
 	width: 40pt;
+	margin-top: 8pt;
 	border-bottom: 1px dotted black;
 	font-weight: bold;
 	text-align: center;
@@ -175,7 +177,7 @@ body {
 	float: left;
 	width: 6%;
 	margin-bottom: 18pt;
-	margin-top: 2pt;
+	margin-top: -8pt;
 }
 .nr-dots2{
 	float: left;

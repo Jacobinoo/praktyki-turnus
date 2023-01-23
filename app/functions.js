@@ -1,7 +1,71 @@
 const replaceLastNChars = function(str, replace, num) {
   return str.slice(0, -num) + Array(num + 1).join(replace);
 };
+function replaceSchoolIdWithSchoolName(id, courseData){
+  try {
+    const name = courseData.schools.find(x => x.id == id).name
+    return name
+  }catch (e) {
+    console.log(e)
+    return `ID szkoły: ${id} - nie istnieje w bazie`
+  }
+}
+export function schoolList(schoolsData){
+  let result = schoolRows(schoolsData)
+  if (result == ""){
+    return `<div class="new-course-form-header">Lista szkół<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+  </svg></div>
+  <div class="new-course-form-content">
+  <h3 class="grayed-caption">Brak szkół</h3>
+  <div class="add-school-btn">Dodaj</div>
+  </div>`
+  }
+  return `<div class="new-course-form-header">Lista szkół<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+</svg></div>
+<div class="school-list-content">
+<div class="add-school-btn">Dodaj</div>
+<table>
+<thead>
+  <tr>
+    <th>ID</th>
+    <th>Nazwa szkoły</th>
+    <th>Adres szkoły</th>
+  </tr>
+</thead>
+<tbody>
+${result}
+</tbody>
+</table>
+</div>`
+}
 
+function schoolRows(schoolsData){
+  let html = ``
+  schoolsData.forEach(school => {
+    html += `<tr>
+    <td>${school.id}</td>
+    <td>${school.name}</td>
+    <td>${school.address}</td>
+    </tr>`
+  });
+  return html;
+}
+export function newSchoolForm(){
+  return `<div class="new-grade-form-header">Dodawanie szkoły<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+</svg></div>
+<div class="new-grade-form-content">
+  <div class="new-grade-form-wrapper">
+    <input type="text" placeholder="Nazwa szkoły" class="new-grade-form-content-input" id="school-name">
+    <textarea placeholder="Pełny adres szkoły" class="new-grade-form-content-input" id="school-address"></textarea>
+  </div>
+  <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+  <span style="display: none;" id="error-label"></span>
+  <div class="new-grade-form-add-grade-btn">Zapisz</div>
+</div>`
+}
 export function newCourseForm() {
   return `<div class="new-course-form-header">Tworzenie nowego turnusu<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
   <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
@@ -25,7 +89,7 @@ export function newCourseForm() {
   <div class="add-course-btn">Dodaj turnus</div>
 </div>`
 }
-export function newParticipantForm() {
+export function newParticipantForm(schoolsList) {
   return `<div class="new-participant-form-header">Dodawanie ucznia do turnusu<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
   <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
 </svg></div>
@@ -35,15 +99,26 @@ export function newParticipantForm() {
     <input type="text" placeholder="Imię i nazwisko" class="new-participant-form-content-input" id="fullname">
     <input type="text" placeholder="Miejsce urodzenia (np. Kielce)" class="new-participant-form-content-input" id="birthplace">
     <input type="phone" placeholder="PESEL" class="new-participant-form-content-input" id="pesel" maxlength="11">
-    <input type="text" placeholder="Adres e-mail ucznia" class="new-participant-form-content-input" id="birthplace">
+    <input type="text" placeholder="Adres e-mail ucznia" class="new-participant-form-content-input" id="email">
     <textarea placeholder="Adres zamieszkania: np. ul. Mickiewicza 10/3. 28-200 Staszów" id="address" rows="3"></textarea>
     <label for="birthdate">Data urodzenia</label>
     <input id="birthdate" type="date" class="new-participant-form-content-date-input">
+    <label for="schoolid">Data urodzenia</label>
+    <select id="schoolid" class="new-grade-form-select">
+    ${schoolSelectList()}
+    </select>
   </div>
   <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
   <span style="display: none;" id="error-label"></span>
   <div class="add-participant-btn">Dodaj ucznia</div>
 </div>`
+function schoolSelectList() {
+  let html = ``
+  schoolsList.forEach(school => {
+    html += `<option value="${school.id}">${school.name}</option>`
+  });
+  return html
+}
 }
 export function renderCourseDetailsView(courseData) {
   return `
@@ -70,25 +145,30 @@ export function renderCourseDetailsView(courseData) {
     </div>`;
 
     function participantsTable(participantsData){
-      return `
-      <table>
-  <thead>
-    <tr>
-      <th>Edycja</th>
-      <th>Imię i nazwisko</th>
-      <th>Data urodzenia</th>
-      <th>Miejsce urodzenia</th>
-      <th>PESEL</th>
-      <th>Szkoła</th>
-      <th>Adres zamieszkania</th>
-      <th>Adres e-mail</th>
-      <th>Zaświadczenie</th>
-    </tr>
-  </thead>
-  <tbody>
-    ${participantRows(participantsData)}
-  </tbody>
-</table>`
+      let result = participantRows(participantsData)
+      if(result == "") {
+        return '<h3 class="grayed-caption">Brak uczniów w tym turnusie</h3>';
+      } else {
+        return `
+              <table>
+          <thead>
+            <tr>
+              <th>Edycja</th>
+              <th>Imię i nazwisko</th>
+              <th>Data urodzenia</th>
+              <th>Miejsce urodzenia</th>
+              <th>PESEL</th>
+              <th>Szkoła</th>
+              <th>Adres zamieszkania</th>
+              <th>Adres e-mail</th>
+              <th>Zaświadczenie</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${result}
+          </tbody>
+        </table>`
+      }
 function participantRows(participantsData) {
   let html = ``
   participantsData.forEach(participant => {
@@ -102,10 +182,10 @@ function participantRows(participantsData) {
   <td>${(new Date(participant.birth_date)).toLocaleDateString('pl-pl')}</td>
   <td>${participant.birth_place}</td>
   <td>${replaceLastNChars(participant.pesel, "*", 6)}</td>
-  <td>${participant.school_name}</td>
+  <td>${replaceSchoolIdWithSchoolName(participant.school_id, courseData)}</td>
   <td>${participant.address}</td>
   <td>${participant.email}</td>
-  <td><a class="download-certificate-btn">Pokaż</a></td>
+  <td><a data-id="${participant.uuid}" class="download-certificate-btn" data-id="${participant.uuid}" data-p="${participant.pesel}" data-name="${courseData.name}">Pokaż</a></td>
 </tr>
     `
   });
@@ -137,7 +217,7 @@ export function newGradeForm(isConductGrade = false){
     <div class="new-grade-form-add-grade-btn">Dodaj ocenę</div>
   </div>`
   } else {
-    return `<div class="new-grade-form-header">Ocena zachowania<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+    return `<div class="new-grade-form-header">Ocena z zachowania<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
   </svg></div>
   <div class="new-conduct-grade-form-content">
@@ -157,7 +237,30 @@ export function newGradeForm(isConductGrade = false){
   </div>`
   }
 }
-export function renderParticipantDetailsView(data) {
+export function editGradeForm(){
+  return `<div class="new-grade-form-header">Edycja oceny<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+  </svg></div>
+  <div class="new-grade-form-content">
+    <div class="new-grade-form-wrapper">
+      <input type="text" placeholder="Nazwa zajęć" value="Kosmetyka" class="new-grade-form-content-input" id="subject-name">
+      <input type="text" placeholder="Wymiar godzin zajęć" value="15h" class="new-grade-form-content-input" id="range-hours">
+      <select id="grade" class="new-grade-form-select">
+        <option value="6">celujący</option>
+        <option value="5" selected>bardzo dobry</option>
+        <option value="4">dobry</option>
+        <option value="3">dostateczny</option>
+        <option value="2">dopuszczający</option>
+        <option value="1">niedostateczny</option>
+      </select>
+    </div>
+    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+    <span style="display: none;" id="error-label"></span>
+    <div class="new-grade-form-add-grade-btn">Zapisz</div>
+  </div>`
+}
+
+export function renderParticipantDetailsView(data, schoolsList) {
   return `
     <div class="participant-details-header">
     <div class="participant-details-header-wrapper">
@@ -166,7 +269,7 @@ export function renderParticipantDetailsView(data) {
       <span>PESEL: <b>${data.pesel}</b></span>
       <span>Data urodzenia: <b>${(new Date(data.birth_date)).toLocaleDateString('pl-pl')}</b></span>
       <span>Miejsce urodzenia: <b>${data.birth_place}</b></span>
-      <span>Szkoła: <b>${data.school_name}</b></span>
+      <span>Szkoła: <b>${replaceSchoolIdWithSchoolName(data.school_id, {"schools":schoolsList})}</b></span>
       <span>Adres zamieszkania: <b>${data.address}</b></span>
       <span>E-mail: <b>${data.email}</b></span>
       </div>
@@ -199,7 +302,7 @@ export function renderParticipantDetailsView(data) {
   </thead>
   <tbody>
     <tr>
-      <td style="cursor: pointer;"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-pen participant-grade-edit-icon" viewBox="0 0 16 16">
+      <td style="cursor: pointer;" class="edit-grade-btn" ><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-pen participant-grade-edit-icon" viewBox="0 0 16 16">
       <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
     </svg></td>
       <td>Kosmetyka </td>

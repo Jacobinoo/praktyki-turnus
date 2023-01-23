@@ -18,17 +18,14 @@ $mpdf->WriteHTML('
             <th rowspan="2" class="LP">Lp.</th>
             <th rowspan="2" width="100pt">Imię nazwisko </th>
             <th rowspan="2" width="80pt">Szkoła kierująca na turnus</th>
-            <th colspan="6">Wynik klasyfikacji z przedmiotów</th>
+            <th colspan="3">Wynik klasyfikacji z przedmiotów</th>
             <th>Zachowanie</th>
         </tr>
         <tr>
             <td>język obcy zawodowy</td>
             <td>Technologia robót wykończeniowych</td>
             <td>Technologia robót wykończeniowych</td>
-            <td>Technologia robót wykończeniowych</td>
-            <td>Technologia robót wykończeniowych</td>
-            <td>Technologia robót wykończeniowych</td>
-            <td>wzorowe</td>
+            <td>Zachowanie</td>
         </tr>
         </thead>
     <tbody>
@@ -39,11 +36,9 @@ $mpdf->WriteHTML('
         <td>5</td>
         <td>5</td>
         <td>4</td>
-        <td>3</td>
-        <td>3</td>
-        <td>2</td>
         <td>wzorowe</td>
     </tr>
+    
     </tbody>
     </table>
 </div>

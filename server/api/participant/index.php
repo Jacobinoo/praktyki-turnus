@@ -61,9 +61,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 elseif($_SERVER["REQUEST_METHOD"] == "GET") {
+    return http_response_code(501);
 }
 elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
-    return http_response_code(501);
+    if(!file_get_contents('php://input')) return http_response_code(500);
+        $response_json = json_decode(file_get_contents('php://input'), true);
+    
+        if(!isset($response_json['id']) || !isset($response_json['courseid'])) {
+            echo json_encode([
+                'error' => 'Nie podano identyfikatora ucznia'
+            ]);
+            return http_response_code(400);
+        }
+        if($response_json['id'] == "" || $response_json['courseid'] == "") {
+            echo json_encode([
+                'error' => 'Nie podano identyfikatora ucznia'
+            ]);
+            return http_response_code(400);
+        }
+        $connection = new mysqli($hostname, $username, $password, $dbname);
+            if ($connection->connect_error) {
+                echo json_encode([
+                    'error' => 'Nie można połączyć się z serwerem bazy danych'
+                ]);
+                return http_response_code(500);
+            }
+            $query = $connection->prepare("DELETE FROM participants WHERE uuid = ? AND assigned_course = ?");
+            $query->bind_param("ss", $response_json['id'], $response_json['courseid']);
+            $query->execute();
+            echo json_encode([
+                'status' => 'success'
+            ]);
+            $connection->close();
 }
 elseif($_SERVER["REQUEST_METHOD"] == "PUT") {
     return http_response_code(501);

@@ -196,6 +196,31 @@ $mpdf->WriteHTML('<div class="container">
     </div>
 </div>
 </div>',\Mpdf\HTMLParserMode::HTML_BODY);
+$mpdf->WriteHTML('<div class="text">Oceny uzyskane z przedmiotów zawodowych teoretycznych objętych programem naucznia realizowanym na turnusie dokształcania teoretycznego młodocianych pracowników:</div>
+<table>
+    <tr>
+        <th>Lp.</th>
+        <th>Nazwa zajęć</th>
+        <th>Wymiar godzin zajęć</th>
+        <th>Ocena<sup style="font-size: 6pt;">5)</sup></th>
+    </tr>
+    <tr>
+        <td>1</td>
+        <td>Jezyk angielski to bardzo popularny jezyk, prawdopodobnie najpopularniejszy jezyk swiata</td>
+        <td>15h</td>
+        <td>5</td>
+    </tr>
+</table>
+<div style="margin-top: 10pt;">
+<div class="grade-text">Ocena zachowania<sup style="font-size: 6pt;">6)</sup></div>
+    <div class="grade-dots">'.$grade.'test</div>
+</div>
+<div class="footer-2">
+    <div class="line-2"></div>
+    <div class="footer-text-2">5) Skala ocen: celujący, bardzo dobry, dostateczny, dopuszczający, niedostateczny.<br>
+    6) Skala ocen: wzorowe, bradzo dobre, dobre, poprawne, nieodpowiednie, naganne.
+    </div>
+</div>',\Mpdf\HTMLParserMode::HTML_BODY);
 //$mpdf->OutputHttpDownload('download.pdf');
 ob_clean();
 $mpdf->Output();

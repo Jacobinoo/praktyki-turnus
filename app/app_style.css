@@ -135,14 +135,17 @@ p {
   height: auto;
   background-color: var(--card-bg);
   padding: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
   color: white;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
   text-align: left;
   justify-content: left;
   align-self: left;
   align-items: left;
   user-select: none;
+  margin-bottom: 2px;
 }
 .add-school-btn:hover{
   background-color: var(--btn-hover);
@@ -608,6 +611,57 @@ b {
   font-size: 14px;
   font-weight: 500;
 }
+.course-details-content-all-participants-btn{
+  height: auto;
+  width: fit-content;
+  background-color: var(--card-bg);
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+.course-details-content-all-participants-btn:hover{
+  background-color: var(--btn-hover);
+}
+
+.course-delete-btn{
+  height: auto;
+  width: fit-content;
+  background-color: red;
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+.course-delete-btn:hover{
+  background-color: rgb(146, 34, 34);
+}
+.participant-delete-btn{
+  height: auto;
+  width: fit-content;
+  background-color: red;
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+.participant-delete-btn:hover{
+  background-color: rgb(146, 34, 34);
+}
 .grayed-caption {
   color: rgb(141, 141, 141);
   color: rgba(0, 0, 0, 0.5);
@@ -944,6 +998,8 @@ table thead {
   background-color: var(--card-bg);
   padding: 7px;
   border-radius: 10px;
+  cursor:pointer;
+  user-select: none;
 }
 .download-certificate-btn:hover{
   background-color: var(--link-hover);

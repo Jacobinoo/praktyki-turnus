@@ -1,5 +1,6 @@
 body {
     position: relative;
+	font-size: 8pt;
 }
 .stump-box {
 	width: 160pt;
@@ -41,6 +42,7 @@ body {
 	text-align: center;
 	margin-top: -10pt;
 	font-weight: bold;
+	text-transform: capitalize;
 }
 .names-description {
 	text-align: center;
@@ -227,4 +229,38 @@ body {
     width: 140pt;
     height: 100pt;
     background-color: rgb(113, 113, 163);
+}
+
+table{
+    width: 100%;
+    margin-top: 10pt;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+th, td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+}
+.grade-text{
+    float: left;
+    width: 15%;
+}
+.grade-dots{
+    float: left;
+    border-bottom: 1px dotted black;
+    width: 85%;
+}
+.footer-2{
+    position: absolute;
+    bottom: 10%;
+    left: 7%;
+}
+.line-2{
+    border-bottom: 1px solid black;
+	width: 160pt;
+	margin-bottom: 10pt;
+}
+.footer-text-2{
+    margin-top: 20pt;
 }

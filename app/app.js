@@ -9,6 +9,7 @@ const mainUI_List = document.querySelector("#container");
 const logoutBtn = document.querySelector(".logout-btn");
 
 let courseId = null;
+let courseCode = null;
 let participantId = null;
 let participantsData = null;
 let isCourseDetailsOpen = false
@@ -23,7 +24,7 @@ let addSchoolFormOpen = false
 
 
 fetchSchools()
-async function fetchSchools() {
+async function fetchSchools(openSchoolList) {
   const response = await fetch(
     "http://localhost/praktyki-turnus/server/api/schools/",
     {
@@ -42,6 +43,10 @@ async function fetchSchools() {
         schoolsList = data.schools
         console.log(schoolsList)
         allowMeToCheckSchoolList = true
+        if(openSchoolList == true) {
+          curtain.replaceChildren()
+          UI_showSchoolList()
+        }
       } else {
         throw `${data.error}`;
       }
@@ -81,6 +86,7 @@ function UI_showSchoolList(){
 }
 //New school form
 function UI_showNewSchoolForm(){
+  if(addSchoolFormOpen == true) return;
   curtain.style.display = "flex";
   const form = document.createElement("div");
   form.innerHTML = newSchoolForm();
@@ -89,10 +95,56 @@ function UI_showNewSchoolForm(){
   form
     .querySelector(".bi-x-circle-fill")
     .addEventListener("click", function () {
-      curtain.style.display = "none";
       form.remove();
+      document.querySelector('.school-list').style.display = "block"
+      addSchoolFormOpen = false
+    });
+  document
+    .querySelector('.add-school-form-btn')
+    .addEventListener('click', function () {
+      createSchool(document.querySelector('#school-name').value, document.querySelector('#school-address').value);
     });
 }
+
+
+async function createSchool(name, address) {
+  const addBtn = document.querySelector('.add-school-form-btn')
+  const errMsg = document.querySelector('.new-school-form > div > #error-label')
+  const loadingRing = document.querySelector('.new-school-form > div > .lds-ring')
+  if(errMsg.textContent !== "") errMsg.textContent = ""
+  addBtn.style.display = "none"
+  loadingRing.style.display = "inline-block"
+  const response = await fetch(
+    "http://localhost/praktyki-turnus/server/api/schools/",
+    {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: `{"name":"${name}","address":"${address}"}`,
+    }
+  );
+  response
+    .json()
+    .then((data) => {
+      if (response.status !== 200) throw `${data.error}`;
+      if (data.status == "success") {
+        fetchSchools(true)
+      } else {
+        throw `${data.error}`;
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      addBtn.style.display = "flex"
+      loadingRing.style.display = "none"
+      errMsg.textContent = `${err}`
+      errMsg.style.display = "block"
+    });
+}
+
+
 
 document.querySelector('body').addEventListener("click", function(e){
   if(!e.target.classList.contains('add-school-btn')) {
@@ -102,6 +154,12 @@ document.querySelector('body').addEventListener("click", function(e){
   return UI_showNewSchoolForm();
 })
 
+document.querySelector('body').addEventListener("click", function(e){
+  if(!e.target.classList.contains('course-details-content-all-participants-btn')) {
+    return
+  }
+  return window.open(`http://localhost/praktyki-turnus/server/arkusz_ocen.php`,'_blank')
+})
 
 document.querySelector('body').addEventListener("click", function(e){
   if(!e.target.classList.contains('download-certificate-btn')) {
@@ -124,6 +182,10 @@ function UI_showNewCourseForm() {
   form.innerHTML = newCourseForm();
   form.className = "new-course-form";
   curtain.appendChild(form);
+  document.querySelector('#range-from').valueAsDate = new Date();
+  let future = new Date();
+  future = new Date(future.setDate(future.getDate() + 30));
+  document.querySelector('#range-to').valueAsDate = future;
   form
     .querySelector(".bi-x-circle-fill")
     .addEventListener("click", function () {
@@ -154,6 +216,8 @@ function UI_showNewParticipantForm() {
   form.innerHTML = newParticipantForm(schoolsList);
   form.className = "new-participant-form";
   curtain.appendChild(form);
+  let past = new Date();
+  document.querySelector('#birthdate').valueAsDate = new Date(past.setDate(past.getDate() - 6570));
   form
     .querySelector(".bi-x-circle-fill")
     .addEventListener("click", function () {
@@ -242,7 +306,7 @@ document.querySelector(".curtain").addEventListener("click", function (e) {
   })
 });
 async function createCourse(code, name, _class, startDate, endDate) {
-  const addBtn = document.querySelector('.add-btn')
+  const addBtn = document.querySelector('.add-course-btn')
   const errMsg = document.querySelector('#error-label')
   const loadingRing = document.querySelector('.lds-ring')
   if(errMsg.textContent !== "") errMsg.textContent = ""
@@ -264,9 +328,10 @@ async function createCourse(code, name, _class, startDate, endDate) {
     .then((data) => {
       if (response.status !== 200) throw `${data.error}`;
       if (data.status == "success") {
-        createCourseComponent(true, data.uuid, _class, code, (new Date(startDate)).toLocaleDateString('pl-pl'), (new Date(startDate)).toLocaleDateString('pl-pl'))
+        createCourseComponent(true, data.uuid, _class, code, (new Date(startDate)).toLocaleDateString('pl-pl'), (new Date(endDate)).toLocaleDateString('pl-pl'), 1)
         curtain.style.display = "none"
         curtain.replaceChildren()
+        isAddCourseFormOpen = false
       } else {
         throw `${data.error}`;
       }
@@ -281,7 +346,8 @@ async function createCourse(code, name, _class, startDate, endDate) {
 }
 
 // Course List
-(async function fetchAllCourses() {
+fetchAllCourses()
+async function fetchAllCourses() {
   const response = await fetch(
     "http://localhost/praktyki-turnus/server/api/course/",
     {
@@ -335,7 +401,7 @@ async function createCourse(code, name, _class, startDate, endDate) {
       document.querySelector('#error-label').textContent = `${err}`
       document.querySelector('#error-label').style.display = "block"
     });
-})();
+}
 
 
 function createCourseComponent(onTheTop = false, uuid, _class, code, startDate, endDate, status) {
@@ -391,6 +457,76 @@ document.querySelector("body").addEventListener("click", function (e) {
   }
   createParticipant(document.querySelector('#fullname').value, document.querySelector('#birthplace').value, document.querySelector('#pesel').value, document.querySelector('#email').value, document.querySelector('#address').value, document.querySelector('#schoolid').value, document.querySelector('#birthdate').value, courseId)
 });
+
+async function deleteCourse(id) {
+  const response = await fetch(
+    "http://localhost/praktyki-turnus/server/api/course/",
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: `{"id":"${id}"}`,
+    }
+  );
+  response
+    .json()
+    .then((data) => {
+      if (response.status !== 200) throw `${data.error}`;
+      if (data.status == "success") {
+        console.log(`Deleted course and its participants`)
+        document.querySelector('.course-details').remove()
+        isCourseDetailsOpen = false
+          const elements = courseList.getElementsByClassName('course');
+          while(elements.length > 0){
+              elements[0].parentNode.removeChild(elements[0]);
+          }
+        fetchAllCourses()
+        mainUI_List.style.display = "block";
+        alert('Turnus został usunięty')
+      } else {
+        throw `${data.error}`;
+      }
+    })
+    .catch((err) => {
+      alert(err)
+      console.error(err);
+    });
+}
+
+
+async function deleteParticipant(id) {
+  const response = await fetch(
+    "http://localhost/praktyki-turnus/server/api/participant/",
+    {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: `{"id":"${id}", "courseid":"${courseId}"}`,
+    }
+  );
+  response
+    .json()
+    .then((data) => {
+      if (response.status !== 200) throw `${data.error}`;
+      if (data.status == "success") {
+        console.log(`Deleted participant`)
+        document.querySelector('.participant-details').remove()
+        isParticipantDetailsOpen = false
+        alert('Uczeń został usunięty.')
+        UI_redirectDetailsView()
+      } else {
+        throw `${data.error}`;
+      }
+    })
+    .catch((err) => {
+      alert(err)
+      console.error(err);
+    });
+}
 
 async function createParticipant(full_name, birth_place, pesel, email, address, school_id, birth_date, assigned_course) {
   const addBtn = document.querySelector('.add-participant-btn')
@@ -460,6 +596,36 @@ document.querySelector("body").addEventListener("click", function (e) {
 });
 
 //Edit grade button
+document.querySelector("body").addEventListener("click", function (e) {
+  if(e.target.classList.contains("edit-grade-btn")) {
+    return UI_showEditGradeForm()
+  }
+  if(e.target.classList.contains("participant-grade-edit-icon")){
+    return UI_showEditGradeForm()
+  }
+});
+
+//Delete course and participant btn
+document.querySelector("body").addEventListener("click", function (e) {
+  if(e.target.classList.contains("course-delete-btn")) {
+    let inputCode = prompt(`Chcesz usunąć turnus "${kwalifikacje[courseCode].name}" z aplikacji!\n\nPotwierdź kod zawodu, aby kontynuować...`)
+    if(inputCode !== courseCode) {
+      if(inputCode == "" || inputCode == undefined) { return }
+      alert('Nieprawidłowy kod zawodu')
+      return;
+    }
+    deleteCourse(courseId)
+  }
+  if(e.target.classList.contains("participant-delete-btn")) {
+    let participantName = participantsData.find(x => x.uuid == participantId).full_name
+    let confirmation = confirm(`Chcesz usunąć ucznia "${participantName}" z turnusu "${kwalifikacje[courseCode].name}"?`)
+    if(!confirmation) {
+      return;
+    }
+    deleteParticipant(participantId)
+  }
+});
+
 document.querySelector("body").addEventListener("click", function (e) {
   if(e.target.classList.contains("edit-grade-btn")) {
     return UI_showEditGradeForm()
@@ -541,6 +707,7 @@ async function UI_redirectDetailsView() {
           participantsData = courseData.participants
           body.appendChild(UI);
           console.log(participantsData)
+          courseCode = data.course.code
           UI.querySelector(".bi-x-circle-fill").addEventListener("click", function () {
             isCourseDetailsOpen = false
             UI.remove()

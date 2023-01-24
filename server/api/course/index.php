@@ -12,7 +12,7 @@ header('Access-Control-Allow-Origin: http://127.0.0.1');
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Headers: Content-Type');
 require_once '/xampp/htdocs/praktyki-turnus/server/connect.php';
-mysqli_report(MYSQLI_REPORT_OFF);
+//mysqli_report(MYSQLI_REPORT_OFF);
 
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!file_get_contents('php://input')) return http_response_code(504);
@@ -117,7 +117,38 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
     }
 }
 elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
-    return http_response_code(501);
+    if(!file_get_contents('php://input')) return http_response_code(500);
+    $response_json = json_decode(file_get_contents('php://input'), true);
+
+    if(!isset($response_json['id'])) {
+        echo json_encode([
+            'error' => 'Nie podano identyfikatora turnusu'
+        ]);
+        return http_response_code(400);
+    }
+    if($response_json['id'] == "" ) {
+        echo json_encode([
+            'error' => 'Nie podano identyfikatora turnusu'
+        ]);
+        return http_response_code(400);
+    }
+    $connection = new mysqli($hostname, $username, $password, $dbname);
+        if ($connection->connect_error) {
+            echo json_encode([
+                'error' => 'Nie można połączyć się z serwerem bazy danych'
+            ]);
+            return http_response_code(500);
+        }
+        $query = $connection->prepare("DELETE FROM courses WHERE uuid = ?");
+        $query->bind_param("s", $response_json['id']);
+        $query->execute();
+        $query = $connection->prepare("DELETE FROM participants WHERE assigned_course = ?");
+        $query->bind_param("s", $response_json['id']);
+        $query->execute();
+        echo json_encode([
+            'status' => 'success'
+        ]);
+        $connection->close();
 }
 elseif($_SERVER["REQUEST_METHOD"] == "PUT") {
     return http_response_code(501);

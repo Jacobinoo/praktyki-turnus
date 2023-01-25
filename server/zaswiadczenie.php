@@ -223,7 +223,8 @@ $mpdf->WriteHTML('<div class="text">Oceny uzyskane z przedmiotów zawodowych teo
 </div>',\Mpdf\HTMLParserMode::HTML_BODY);
 //$mpdf->OutputHttpDownload('download.pdf');
 ob_clean();
-$mpdf->Output();
+$mpdf->SetTitle('Podgląd');
+$mpdf->Output("Zaświadczenie_{$names_surname}_Kurs_{$course_code}.pdf", 'I');
 }
 elseif($_SERVER["REQUEST_METHOD"] == "POST") {
     return http_response_code(501);

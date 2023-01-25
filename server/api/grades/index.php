@@ -17,21 +17,21 @@ mysqli_report(MYSQLI_REPORT_OFF);
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!file_get_contents('php://input')) return http_response_code(400);
     $response_json = json_decode(file_get_contents('php://input'), true);
-    if(!isset($response_json['full_name']) || !isset($response_json['birth_date']) || !isset($response_json['birth_place']) || !isset($response_json['pesel']) || !isset($response_json['school_id']) || !isset($response_json['address']) || !isset($response_json['email']) || !isset($response_json['assigned_course'])) {
+    if(!isset($response_json['subject_name']) || !isset($response_json['range_hours']) || !isset($response_json['grade']) || !isset($response_json['userid'])) {
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
         return http_response_code(400);
     }
-    if($response_json['full_name'] == "" || $response_json['birth_date'] == "" || $response_json['birth_place'] == "" || $response_json['pesel'] == "" || $response_json['school_id'] == "" || $response_json['address'] == "" || $response_json['email'] == "" || $response_json['assigned_course'] == ""){
+    if($response_json['subject_name'] == "" || $response_json['range_hours'] == "" || $response_json['grade'] == "" || $response_json['userid'] == ""){
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
         return http_response_code(500);
     }
-    if(strlen($response_json['pesel']) != 11) {
+    if($response_json['grade'] < 1 || $response_json['grade'] > 6) {
         echo json_encode([
-            'error' => 'PESEL musi mieć 11 cyfr'
+            'error' => 'Nieprawidłowa skala ocen'
         ]);
         return http_response_code(500);
     }
@@ -43,18 +43,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
             return http_response_code(500);
         }
-        $uuid = Uuid::uuid4();
-        $query = $connection->prepare("INSERT INTO participants (uuid, full_name, birth_date, birth_place, pesel, school_id, address, email, assigned_course) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
-        $query->bind_param("sssssisss", $uuid, $response_json['full_name'], $response_json['birth_date'], $response_json['birth_place'], $response_json['pesel'], $response_json['school_id'], $response_json['address'], $response_json['email'], $response_json['assigned_course']);
+        $query = $connection->prepare("INSERT INTO grades (subject_name, range_hours, grade, is_conduct_grade, assigned_to_userid) VALUES (?, ?, ?, 0, ?);");
+        $query->bind_param("siis", $response_json['subject_name'], $response_json['range_hours'], $response_json['grade'], $response_json['userid']);
         if($query->execute()) {
             echo json_encode([
-                'status' => 'success',
-                'uuid'=> $uuid
+                'status' => 'success'
             ]);
         } else {
             echo json_encode([
                 'status' => 'error',
-                'error'=> 'Wystąpił błąd przy dodawaniu ucznia'
+                'error'=> 'Wystąpił błąd przy dodawaniu oceny'
             ]);
             return http_response_code(500);
         }
@@ -71,20 +69,34 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
         ]);
         return http_response_code(400);
     }
+    if($response_json['id'] == "") {
+        echo json_encode([
+            'status' => 'error',
+            'error'=> 'Nie podano identyfikatora'
+        ]);
+        return http_response_code(400);
+    }
+    $connection = @new mysqli($hostname, $username, $password, $dbname);
+    if ($connection->connect_error) {
+        echo json_encode([
+            'error' => 'Nie można połączyć się z serwerem bazy danych'
+        ]);
+        return http_response_code(500);
+    }
     $query = $connection->prepare("SELECT * FROM grades WHERE assigned_to_userid = ? ORDER BY subject_name ASC");
     $query->bind_param("s", $response_json['id']);
-    if($query->execute()) {
-        $result = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+    $query->execute();
+    $query->store_result();
+    $rows = $query->num_rows;
+    $query->execute();
+    $result = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+    if($rows < 1) {
+        echo json_encode([]);
+    } else {
         echo json_encode([
             'status' => 'success',
             'grades' => $result
         ]);
-    } else {
-        echo json_encode([
-            'status' => 'error',
-            'error'=> 'Wystąpił błąd przy dodawaniu ucznia'
-        ]);
-        return http_response_code(500);
     }
     $connection->close();
 }

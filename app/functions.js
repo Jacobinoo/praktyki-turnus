@@ -25,12 +25,15 @@ export function schoolList(schoolsData){
   <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
 </svg></div>
 <div class="school-list-content">
+<div style="display: flex; gap: 5px;">
 <div class="add-school-btn">Dodaj</div>
+</div>
 <table>
 <thead>
   <tr>
     <th>Nazwa szkoły</th>
     <th>Adres szkoły</th>
+    <th>Edycja</th>
   </tr>
 </thead>
 <tbody>
@@ -46,6 +49,7 @@ function schoolRows(schoolsData){
     html += `<tr>
     <td>${school.name}</td>
     <td>${school.address}</td>
+    <td><div class="delete-school-btn">Usuń</div></td>
     </tr>`
   });
   return html;
@@ -268,18 +272,20 @@ export function editGradeForm(){
   </div>`
 }
 
-export function renderParticipantDetailsView(data, schoolsList) {
+export function renderParticipantDetailsView(data, schoolsList, participantId) {
+  let grades = data.grades.filter(x => x.assigned_to_userid == participantId);
+  let data_ = data.participants.find(x => x.uuid == participantId)
   return `
     <div class="participant-details-header">
     <div class="participant-details-header-wrapper">
-    Uczeń: ${data.full_name}
+    Uczeń: ${data_.full_name}
       <div class="participant-details-header-squares">
-      <span>PESEL: <b>${data.pesel}</b></span>
-      <span>Data urodzenia: <b>${(new Date(data.birth_date)).toLocaleDateString('pl-pl')}</b></span>
-      <span>Miejsce urodzenia: <b>${data.birth_place}</b></span>
-      <span>Szkoła: <b>${replaceSchoolIdWithSchoolName(data.school_id, {"schools":schoolsList})}</b></span>
-      <span>Adres zamieszkania: <b>${data.address}</b></span>
-      <span>E-mail: <b>${data.email}</b></span>
+      <span>PESEL: <b>${data_.pesel}</b></span>
+      <span>Data urodzenia: <b>${(new Date(data_.birth_date)).toLocaleDateString('pl-pl')}</b></span>
+      <span>Miejsce urodzenia: <b>${data_.birth_place}</b></span>
+      <span>Szkoła: <b>${replaceSchoolIdWithSchoolName(data_.school_id, {"schools":schoolsList})}</b></span>
+      <span>Adres zamieszkania: <b>${data_.address}</b></span>
+      <span>E-mail: <b>${data_.email}</b></span>
       </div>
     </div>
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
@@ -290,7 +296,7 @@ export function renderParticipantDetailsView(data, schoolsList) {
     <div class="participant-details-content-section">
     <h2>Oceny</h2>
     <div class="participant-details-add-grade-btn">Dodaj ocenę</div>
-    ${gradesTable()}
+    ${gradesTable(grades)}
     <div class="conduct-grade-box">Ocena z zachowania:<div class="conduct-grade"></div>
     <div class="conduct-grade-btn"></div>
     </div>
@@ -302,27 +308,41 @@ export function renderParticipantDetailsView(data, schoolsList) {
     
     </div>`;
 
-    function gradesTable(){
-      return `
-<table>
+    function gradesTable(grades){
+      return gradesRows()
+function gradesRows() {
+  let html = ``
+  console.log("grades",grades)
+  grades.forEach(grade => {
+    html = html + `
+    <tr>
+      <td style="cursor: pointer;" data-id="${grade.id}" class="participant-grade-edit-icon-click" ><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-pen participant-grade-edit-icon participant-grade-edit-icon-click" viewBox="0 0 16 16" data-id="${grade.id}">
+      <path class="participant-grade-edit-icon-click" data-id="${grade.id}" d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+    </svg></td>
+  <td>${grade.subject_name}</td>
+  <td>${grade.range_hours}</td>
+  <td>${grade.grade}</td>
+  <td><div class="delete-grade-btn">Usuń</div></td>
+</tr>
+    `
+  });
+  if(html == ``) {
+    return `<h3 class="grayed-caption">Brak ocen</h3>`
+  }
+  return `<table>
   <thead>
     <tr>
       <th>Edycja</th>
       <th>Nazwa zajęć</th>
       <th>Wymiar godzin zajęć</th>
       <th>Ocena</th>
+      <th>Usuwanie</th>
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <td style="cursor: pointer;" class="edit-grade-btn" ><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-pen participant-grade-edit-icon" viewBox="0 0 16 16">
-      <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
-    </svg></td>
-      <td>Kosmetyka </td>
-      <td>15 godzin</td>
-      <td>5</td>
-    </tr>
+    ${html}
   </tbody>
 </table>`
+}
     }
 }

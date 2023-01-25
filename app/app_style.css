@@ -150,6 +150,47 @@ p {
 .add-school-btn:hover{
   background-color: var(--btn-hover);
 }
+svg:hover{
+  transform: scale(1.1);
+  transition: all 0.1s ease-in-out;
+}
+.delete-school-btn{
+  width: fit-content;
+  height: auto;
+  background-color: red;
+  padding: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: left;
+  justify-content: left;
+  align-self: left;
+  align-items: left;
+  user-select: none;
+  margin-bottom: 2px;
+}
+.delete-school-btn:hover{
+  background-color: rgb(146, 34, 34);
+}
+.delete-grade-btn{
+  width: fit-content;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: red;
+  padding: 5px;
+  padding-left: 8px;
+  padding-right: 8px;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.delete-grade-btn:hover{
+  background-color: rgb(146, 34, 34);
+}
 .school-list-content {
   padding: 25px;
   padding-top: 15px;
@@ -610,6 +651,7 @@ b {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  user-select: none;
 }
 .course-details-content-all-participants-btn{
   height: auto;
@@ -623,6 +665,7 @@ b {
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
+  user-select: none;
 }
 .course-details-content-all-participants-btn:hover{
   background-color: var(--btn-hover);
@@ -680,7 +723,8 @@ b {
   color: white;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500
+  font-weight: 500;
+  user-select: none;
 }
 .course-details-add-grade-btn:hover{
   background-color: var(--btn-hover);
@@ -807,7 +851,8 @@ b {
   color: white;
   cursor: pointer;
   font-size: 14px;
-  font-weight: 500
+  font-weight: 500;
+  user-select: none;
 }
 .participant-details-add-grade-btn:hover{
   background-color: var(--btn-hover);
@@ -909,6 +954,7 @@ b {
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
+  user-select: none;
 }
 .new-grade-form-add-grade-btn:hover{
 background-color: var(--btn-hover);
@@ -931,6 +977,7 @@ background-color: var(--btn-hover);
   border-radius: 10px;
   margin-left: 10px;
   cursor: pointer;
+  user-select: none;
 }
 .conduct-grade-btn:hover{
   background-color: var(--btn-hover);

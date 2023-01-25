@@ -158,7 +158,7 @@ document.querySelector('body').addEventListener("click", function(e){
   if(!e.target.classList.contains('course-details-content-all-participants-btn')) {
     return
   }
-  return window.open(`http://localhost/praktyki-turnus/server/arkusz_ocen.php`,'_blank')
+  return window.open(`http://localhost/praktyki-turnus/server/arkusz_ocen.php?id=${courseId}&name=${kwalifikacje[courseCode].name}`,'_blank')
 })
 
 document.querySelector('body').addEventListener("click", function(e){
@@ -238,7 +238,7 @@ function UI_showNewGradeForm(isConductGrade = false){
     .addEventListener("click", function () {
       isAddGradeFormOpen = false
       curtain.style.display = "none";
-      form.remove();
+      curtain.replaceChildren()
     });
 }
 
@@ -251,8 +251,9 @@ function UI_showEditGradeForm(){
   form
     .querySelector(".bi-x-circle-fill")
     .addEventListener("click", function () {
+      isEditGradeFormOpen = false
       curtain.style.display = "none";
-      form.remove();
+      curtain.replaceChildren()
     });
 }
 
@@ -458,6 +459,8 @@ document.querySelector("body").addEventListener("click", function (e) {
   createParticipant(document.querySelector('#fullname').value, document.querySelector('#birthplace').value, document.querySelector('#pesel').value, document.querySelector('#email').value, document.querySelector('#address').value, document.querySelector('#schoolid').value, document.querySelector('#birthdate').value, courseId)
 });
 
+
+
 async function deleteCourse(id) {
   const response = await fetch(
     "http://localhost/praktyki-turnus/server/api/course/",
@@ -597,12 +600,10 @@ document.querySelector("body").addEventListener("click", function (e) {
 
 //Edit grade button
 document.querySelector("body").addEventListener("click", function (e) {
-  if(e.target.classList.contains("edit-grade-btn")) {
-    return UI_showEditGradeForm()
+  if(!e.target.classList.contains("participant-grade-edit-icon-click")){
+    return;
   }
-  if(e.target.classList.contains("participant-grade-edit-icon")){
-    return UI_showEditGradeForm()
-  }
+  UI_showEditGradeForm()
 });
 
 //Delete course and participant btn
@@ -617,7 +618,7 @@ document.querySelector("body").addEventListener("click", function (e) {
     deleteCourse(courseId)
   }
   if(e.target.classList.contains("participant-delete-btn")) {
-    let participantName = participantsData.find(x => x.uuid == participantId).full_name
+    let participantName = participantsData.participants.find(x => x.uuid == participantId).full_name
     let confirmation = confirm(`Chcesz usunąć ucznia "${participantName}" z turnusu "${kwalifikacje[courseCode].name}"?`)
     if(!confirmation) {
       return;
@@ -626,20 +627,62 @@ document.querySelector("body").addEventListener("click", function (e) {
   }
 });
 
-document.querySelector("body").addEventListener("click", function (e) {
-  if(e.target.classList.contains("edit-grade-btn")) {
-    return UI_showEditGradeForm()
+document.querySelector('body').addEventListener('click', function (e) {
+  if(!e.target.classList.contains('new-grade-form-add-grade-btn')) {
+    return;
   }
-  if(e.target.classList.contains("participant-grade-edit-icon")){
-    return UI_showEditGradeForm()
-  }
-});
+  addGrade(document.querySelector('#subject-name').value, document.querySelector('#range-hours').value, document.querySelector('#grade').value)
+})
+
+async function addGrade(subject, hours, grade) {
+    const addBtn = document.querySelector('.new-grade-form-add-grade-btn')
+    const errMsg = document.querySelector('.new-grade-form-content > #error-label')
+    const loadingRing = document.querySelector('.new-grade-form-content > .lds-ring')
+    if(errMsg.textContent !== "") errMsg.textContent = ""
+    addBtn.style.display = "none"
+    loadingRing.style.display = "inline-block"
+    const response = await fetch(
+      "http://localhost/praktyki-turnus/server/api/grades/",
+      {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: `{"subject_name":"${subject}","range_hours":"${hours}","grade":"${grade}","userid":"${participantId}"}`,
+      }
+    );
+    response
+      .json()
+      .then((data) => {
+        if (response.status !== 200) throw `${data.error}`;
+        if (data.status == "success") {
+          console.log(`New grade`)
+          document.querySelector('.new-grade-form').remove()
+          document.querySelector('.participant-details').remove()
+          isParticipantDetailsOpen = false
+          UI_redirectParticipantView()
+          curtain.style.display = "none"
+          curtain.replaceChildren()
+          isAddGradeFormOpen = false
+        } else {
+          throw `${data.error}`;
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        addBtn.style.display = "flex"
+        loadingRing.style.display = "none"
+        errMsg.textContent = `${err}`
+        errMsg.style.display = "block"
+      });
+}
 
 async function UI_redirectParticipantView() {
   console.log(`redirecting to participant ${participantId}`)
   const UI = document.createElement("div");
   UI.className = "participant-details";
-  UI.innerHTML = renderParticipantDetailsView(participantsData.find(x => x.uuid == participantId), schoolsList)
+  UI.innerHTML = renderParticipantDetailsView(participantsData, schoolsList, participantId)
   mainUI_List.style.display = "none";
   body.appendChild(UI);
   document.querySelector(".conduct-grade").innerText == "" ? document.querySelector(".conduct-grade-btn").innerText = "Dodaj" : document.querySelector(".conduct-grade-btn").innerText = "Zmień"
@@ -700,11 +743,12 @@ async function UI_redirectDetailsView() {
             startDate:startDate,
             endDate:endDate,
             participants: data.participants,
+            grades: data.grades,
             schools: schoolsList
           }
           UI.innerHTML = renderCourseDetailsView(courseData);
           mainUI_List.style.display = "none";
-          participantsData = courseData.participants
+          participantsData = {"participants":courseData.participants, "grades":courseData.grades}
           body.appendChild(UI);
           console.log(participantsData)
           courseCode = data.course.code

@@ -85,6 +85,15 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
         $query->execute();
         $result_participants = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
+        //Grades table
+        $query = $connection->prepare("SELECT * FROM grades ORDER BY subject_name ASC");
+        $query->execute();
+        $query->store_result();
+        $rows_grades = $query->num_rows;
+        $query->execute();
+        $result_grades = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+
         // Schools table
         // $query = $connection->prepare("SELECT * FROM schools ORDER BY name ASC");
         // $query->execute();
@@ -94,6 +103,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
             "status" => "success",
             "course" => $result_course,
             "participants" => $rows_participants<1 ? [] : $result_participants,
+            "grades" => $rows_grades<1 ? [] : $result_grades,
             //"schools" => $result_schools
         ]);
     } elseif(!isset($_GET['id']) || $_GET['id'] == "") {

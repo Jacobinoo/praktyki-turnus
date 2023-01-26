@@ -58,11 +58,39 @@ function test() {
     }
     $course = $query->get_result()
     ->fetch_assoc();
+
+        //schools list
+        $query = $connection->prepare("SELECT * FROM schools");
+        $query->bind_param("s",  $uuid);
+        $query->execute();
+        $query->store_result();
+        $rows_subjects = $query->num_rows;
+        $query->execute();
+        if($rows_subjects < 1) {
+            $result_subjects = [];
+        }
+        $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        //Subject list
+        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ?");
+        $query->bind_param("s",  $uuid);
+        $query->execute();
+        $query->store_result();
+        $rows_subjects = $query->num_rows;
+        $query->execute();
+        if($rows_subjects < 1) {
+            $result_subjects = [];
+        }
+        $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
     $connection->close();
     $index = 1;
     foreach ($result_participants as $participant) {
         $html2 .= "<tr><td>{$index}</td><td style='text-transform: capitalize;'>".$participant['full_name']."</td><td>szkoła</td></tr>";
         $index = $index + 1;
+    }
+    foreach($result_subjects as $subject) {
+        $przedmioty_html .= "<td>".$subject['name']."</td>";
     }
     $html = '
     <div class="container">
@@ -76,14 +104,11 @@ function test() {
                 <th rowspan="2" class="LP">Lp.</th>
                 <th rowspan="2" width="100pt">Imię nazwisko </th>
                 <th rowspan="2" width="80pt">Szkoła kierująca na turnus</th>
-                <th colspan="3">Wynik klasyfikacji z przedmiotów</th>
+                <th colspan="'.$rows_subjects.'">Wynik klasyfikacji z przedmiotów</th>
                 <th>Zachowanie</th>
             </tr>
             <tr>
-                <td>język obcy zawodowy</td>
-                <td>Technologia robót wykończeniowych</td>
-                <td>Technologia robót wykończeniowych</td>
-                <td>Zachowanie</td>
+            '.$przedmioty_html.'<td>zachowanie</td>
             </tr>
             </thead>
         <tbody>

@@ -86,12 +86,21 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
         $result_participants = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
         //Grades table
-        $query = $connection->prepare("SELECT * FROM grades ORDER BY subject_name ASC");
+        $query = $connection->prepare("SELECT * FROM grades ORDER BY id ASC");
         $query->execute();
         $query->store_result();
         $rows_grades = $query->num_rows;
         $query->execute();
         $result_grades = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        //Subjects table
+        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ? ORDER BY name ASC");
+        $query->bind_param("s", $courseId);
+        $query->execute();
+        $query->store_result();
+        $rows_subjects = $query->num_rows;
+        $query->execute();
+        $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
 
         // Schools table
@@ -104,6 +113,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
             "course" => $result_course,
             "participants" => $rows_participants<1 ? [] : $result_participants,
             "grades" => $rows_grades<1 ? [] : $result_grades,
+            "subjects" => $rows_subjects<1 ? [] : $result_subjects
             //"schools" => $result_schools
         ]);
     } elseif(!isset($_GET['id']) || $_GET['id'] == "") {

@@ -73,7 +73,73 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
         $school = "Błąd - nieznana szkoła ~ nie istnieje w bazie danych";
     }
     $result_school = $query->get_result()->fetch_assoc();
+
+    //Subject list
+    $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ?");
+    $query->bind_param("s",  $result_participant['assigned_course']);
+    $query->execute();
+    $query->store_result();
+    $rows = $query->num_rows;
+    $query->execute();
+    if($rows < 1) {
+        $result_subjects = [];
+    }
+    $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+
+    //Grades
+    $query = $connection->prepare("SELECT * FROM grades WHERE assigned_to_userid = ?");
+    $query->bind_param("s",  $uuid);
+    $query->execute();
+    $query->store_result();
+    $rows = $query->num_rows;
+    $query->execute();
+    if($rows < 1) {
+        $result_grades = [];
+    }
+    $result_grades = $query->get_result()->fetch_all(MYSQLI_ASSOC);
     $connection->close();
+
+    function gradesRows($result_grades) {
+        $html2 = "";
+        $i = 0;
+        foreach ($result_grades as $row) {
+            $i = $i+1;
+            $html2 .= "<tr>
+            <td>{$i}</td>
+            <td></td>
+            <td></td>
+            <td>".$row['grade']."</td>
+            </tr>";
+        }
+        $html = '<div class="text">Oceny uzyskane z przedmiotów zawodowych teoretycznych objętych programem naucznia realizowanym na turnusie dokształcania teoretycznego młodocianych pracowników:</div>
+    <table>
+        <tr>
+            <th>Lp.</th>
+            <th>Nazwa zajęć</th>
+            <th>Wymiar godzin zajęć</th>
+            <th>Ocena<sup style="font-size: 6pt;">5)</sup></th>
+        </tr>
+        '.$html2.'
+        <tr>
+            <td>1</td>
+            <td>Jezyk angielski to bardzo popularny jezyk, prawdopodobnie najpopularniejszy jezyk swiata</td>
+            <td>15h</td>
+            <td>5</td>
+        </tr>
+    </table>
+    <div style="margin-top: 10pt;">
+    <div class="grade-text">Ocena zachowania<sup style="font-size: 6pt;">6)</sup></div>
+        <div class="grade-dots">test</div>
+    </div>
+    <div class="footer-2">
+        <div class="line-2"></div>
+        <div class="footer-text-2">5) Skala ocen: celujący, bardzo dobry, dostateczny, dopuszczający, niedostateczny.<br>
+        6) Skala ocen: wzorowe, bradzo dobre, dobre, poprawne, nieodpowiednie, naganne.
+        </div>
+    </div>';
+        return $html;
+    };
 
 
     $names_surname = $result_participant['full_name'];
@@ -196,31 +262,7 @@ $mpdf->WriteHTML('<div class="container">
     </div>
 </div>
 </div>',\Mpdf\HTMLParserMode::HTML_BODY);
-$mpdf->WriteHTML('<div class="text">Oceny uzyskane z przedmiotów zawodowych teoretycznych objętych programem naucznia realizowanym na turnusie dokształcania teoretycznego młodocianych pracowników:</div>
-<table>
-    <tr>
-        <th>Lp.</th>
-        <th>Nazwa zajęć</th>
-        <th>Wymiar godzin zajęć</th>
-        <th>Ocena<sup style="font-size: 6pt;">5)</sup></th>
-    </tr>
-    <tr>
-        <td>1</td>
-        <td>Jezyk angielski to bardzo popularny jezyk, prawdopodobnie najpopularniejszy jezyk swiata</td>
-        <td>15h</td>
-        <td>5</td>
-    </tr>
-</table>
-<div style="margin-top: 10pt;">
-<div class="grade-text">Ocena zachowania<sup style="font-size: 6pt;">6)</sup></div>
-    <div class="grade-dots">'.$grade.'test</div>
-</div>
-<div class="footer-2">
-    <div class="line-2"></div>
-    <div class="footer-text-2">5) Skala ocen: celujący, bardzo dobry, dostateczny, dopuszczający, niedostateczny.<br>
-    6) Skala ocen: wzorowe, bradzo dobre, dobre, poprawne, nieodpowiednie, naganne.
-    </div>
-</div>',\Mpdf\HTMLParserMode::HTML_BODY);
+$mpdf->WriteHTML($html,\Mpdf\HTMLParserMode::HTML_BODY);
 //$mpdf->OutputHttpDownload('download.pdf');
 ob_clean();
 $mpdf->SetTitle('Podgląd');

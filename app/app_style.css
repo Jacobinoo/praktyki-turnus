@@ -671,6 +671,40 @@ b {
   background-color: var(--btn-hover);
 }
 
+.course-details-content-empty-certificate-btn{
+  height: auto;
+  width: fit-content;
+  background-color: var(--card-bg);
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+.course-details-content-empty-certificate-btn:hover{
+  background-color: var(--btn-hover);
+}
+.add-subject-btn {
+  height: auto;
+  width: fit-content;
+  background-color: var(--card-bg);
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+.add-subject-btn:hover {
+  background-color: var(--btn-hover);
+}
 .course-delete-btn{
   height: auto;
   width: fit-content;
@@ -686,6 +720,25 @@ b {
   user-select: none;
 }
 .course-delete-btn:hover{
+  background-color: rgb(146, 34, 34);
+}
+.subject-delete-btn{
+  height: auto;
+  width: fit-content;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: red;
+  padding: 7px;
+  padding-left: 12px;
+  padding-right: 12px;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  user-select: none;
+}
+.subject-delete-btn:hover{
   background-color: rgb(146, 34, 34);
 }
 .participant-delete-btn{
@@ -727,6 +780,42 @@ b {
   user-select: none;
 }
 .course-details-add-grade-btn:hover{
+  background-color: var(--btn-hover);
+}
+.new-subject-form{
+    width: 700px;
+    min-height: 200px;
+    border-radius: 20px;
+    background-color: white;
+    padding-bottom: 25px;
+    overflow: hidden;
+    -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    cursor: default;
+}
+.new-subject-form-content-info-wrapper{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(197, 202, 255);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 50px;
+    gap: 14px;
+    margin-bottom: 10px;
+}
+.add-new-subject-form-btn{
+  height: auto;
+    width: auto;
+    background-color: var(--btn);
+    padding: 10px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+.add-new-subject-form-btn:hover {
   background-color: var(--btn-hover);
 }
 
@@ -959,6 +1048,21 @@ b {
 .new-grade-form-add-grade-btn:hover{
 background-color: var(--btn-hover);
 }
+.edit-grade-form-edit-btn{
+  height: auto;
+  width: auto;
+  background-color: var(--btn);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  user-select: none;
+}
+.edit-grade-form-edit-btn:hover{
+background-color: var(--btn-hover);
+}
 .conduct-grade-box{
   display: flex;
   align-items: center;
@@ -999,6 +1103,21 @@ background-color: var(--btn-hover);
   padding: 15px;
   gap: 14px;
   margin-bottom: 10px;
+}
+.new-conduct-grade-form-add-grade-btn{
+  height: auto;
+  width: auto;
+  background-color: var(--btn);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  user-select: none;
+}
+.new-conduct-grade-form-add-grade-btn:hover{
+background-color: var(--btn-hover);
 }
 /*Edit grade*/
 .edit-grade-form{

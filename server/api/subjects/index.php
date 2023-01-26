@@ -13,6 +13,28 @@ require_once '/xampp/htdocs/praktyki-turnus/server/connect.php';
 mysqli_report(MYSQLI_REPORT_OFF);
 
 if($_SERVER["REQUEST_METHOD"] == "GET") {
+    if(!file_get_contents('php://input')) {
+        echo json_encode([
+            'status' => 'error',
+            'error'=> 'Nie przekazano żadnych danych'
+        ]);
+        return http_response_code(400);
+    }
+    $response_json = json_decode(file_get_contents('php://input'), true);
+    if(!isset($response_json['assigned_to_courseid'])) {
+        echo json_encode([
+            'status' => 'error',
+            'error'=> 'Nie podano identyfikatora turnusu'
+        ]);
+        return http_response_code(400);
+    }
+    if($response_json['assigned_to_courseid'] == "") {
+        echo json_encode([
+            'status' => 'error',
+            'error'=> 'Nie podano identyfikatora turnusu'
+        ]);
+        return http_response_code(400);
+    }
     $connection = @new mysqli($hostname, $username, $password, $dbname);
         if ($connection->connect_error) {
             echo json_encode([
@@ -20,17 +42,18 @@ if($_SERVER["REQUEST_METHOD"] == "GET") {
             ]);
             return http_response_code(500);
         }
-        $query = $connection->prepare("SELECT * FROM schools ORDER BY name ASC");
+        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ? ORDER BY name ASC");
+        $query->bind_param("s", $response_json['assigned_to_courseid']);
         if($query->execute()) {
             $result = $query->get_result()->fetch_all(MYSQLI_ASSOC);
             echo json_encode([
                 'status' => 'success',
-                'schools' => $result
+                'subjects' => $result
             ]);
         } else {
             echo json_encode([
                 'status' => 'error',
-                'error'=> 'Wystąpił błąd przy pobieraniu danych o szkołach'
+                'error'=> 'Wystąpił błąd przy pobieraniu danych o przedmiotach'
             ]);
             http_response_code(500);
         }
@@ -45,14 +68,14 @@ elseif($_SERVER["REQUEST_METHOD"] == "POST") {
         return http_response_code(400);
     }
     $response_json = json_decode(file_get_contents('php://input'), true);
-    if(!isset($response_json['name']) || !isset($response_json['address'])) {
+    if(!isset($response_json['name']) || !isset($response_json['assigned_to_courseid']) || !isset($response_json['range_hours'])) {
         echo json_encode([
             'status' => 'error',
             'error'=> 'Nie wszystkie pola są wypełnione'
         ]);
         return http_response_code(400);
     }
-    if($response_json['name'] == "" || $response_json['address'] == "") {
+    if($response_json['name'] == "" || $response_json['assigned_to_courseid'] == "" || $response_json['range_hours'] == "") {
         echo json_encode([
             'status' => 'error',
             'error'=> 'Nie wszystkie pola są wypełnione'
@@ -66,8 +89,8 @@ elseif($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
             return http_response_code(500);
         }
-        $query = $connection->prepare("INSERT INTO schools (name, address) VALUES (?, ?)");
-        $query->bind_param("ss", $response_json['name'], $response_json['address']);
+        $query = $connection->prepare("INSERT INTO subjects (name, assigned_to_courseid, range_hours) VALUES (?, ?, ?)");
+        $query->bind_param("ssi", $response_json['name'], $response_json['assigned_to_courseid'], $response_json['range_hours']);
         if($query->execute()) {
             echo json_encode([
                 'status' => 'success'
@@ -75,7 +98,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             echo json_encode([
                 'status' => 'error',
-                'error'=> 'Wystąpił błąd przy dodawaniu szkoły'
+                'error'=> 'Wystąpił błąd przy dodawaniu przedmiotu'
             ]);
             http_response_code(500);
         }
@@ -85,15 +108,15 @@ elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
     if(!file_get_contents('php://input')) return http_response_code(500);
         $response_json = json_decode(file_get_contents('php://input'), true);
     
-        if(!isset($response_json['id'])) {
+        if(!isset($response_json['id']) || !isset($response_json['assigned_to_courseid'])) {
             echo json_encode([
-                'error' => 'Nie podano identyfikatora szkoły'
+                'error' => 'Nie podano identyfikatorów'
             ]);
             return http_response_code(400);
         }
-        if($response_json['id'] == "") {
+        if($response_json['id'] == "" || $response_json['assigned_to_courseid'] == "") {
             echo json_encode([
-                'error' => 'Nie podano identyfikatora szkoły'
+                'error' => 'Nie podano identyfikatorów'
             ]);
             return http_response_code(400);
         }
@@ -104,8 +127,8 @@ elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
                 ]);
                 return http_response_code(500);
             }
-            $query = $connection->prepare("DELETE FROM schools WHERE id = ?");
-            $query->bind_param("s", $response_json['id']);
+            $query = $connection->prepare("DELETE FROM subjects WHERE id = ? AND assigned_to_courseid = ?");
+            $query->bind_param("ss", $response_json['id'], $response_json['assigned_to_courseid']);
             $query->execute();
             echo json_encode([
                 'status' => 'success'

@@ -17,13 +17,13 @@ mysqli_report(MYSQLI_REPORT_OFF);
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(!file_get_contents('php://input')) return http_response_code(400);
     $response_json = json_decode(file_get_contents('php://input'), true);
-    if(!isset($response_json['subject_name']) || !isset($response_json['range_hours']) || !isset($response_json['grade']) || !isset($response_json['userid'])) {
+    if(!isset($response_json['subject_id']) || !isset($response_json['grade']) || !isset($response_json['userid'])) {
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
         return http_response_code(400);
     }
-    if($response_json['subject_name'] == "" || $response_json['range_hours'] == "" || $response_json['grade'] == "" || $response_json['userid'] == ""){
+    if($response_json['subject_id'] == "" || $response_json['grade'] == "" || $response_json['userid'] == ""){
         echo json_encode([
             'error' => 'Wszystkie pola muszą być wypełnione'
         ]);
@@ -43,8 +43,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             ]);
             return http_response_code(500);
         }
-        $query = $connection->prepare("INSERT INTO grades (subject_name, range_hours, grade, is_conduct_grade, assigned_to_userid) VALUES (?, ?, ?, 0, ?);");
-        $query->bind_param("siis", $response_json['subject_name'], $response_json['range_hours'], $response_json['grade'], $response_json['userid']);
+        $query = $connection->prepare("INSERT INTO grades (subject_id, grade, is_conduct_grade, assigned_to_userid) VALUES (?, ?, 0, ?);");
+        $query->bind_param("iis", $response_json['subject_id'], $response_json['grade'], $response_json['userid']);
         if($query->execute()) {
             echo json_encode([
                 'status' => 'success'
@@ -104,15 +104,15 @@ elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
     if(!file_get_contents('php://input')) return http_response_code(500);
         $response_json = json_decode(file_get_contents('php://input'), true);
     
-        if(!isset($response_json['id']) || !isset($response_json['courseid'])) {
+        if(!isset($response_json['id'])) {
             echo json_encode([
-                'error' => 'Nie podano identyfikatora ucznia'
+                'error' => 'Nie podano identyfikatora oceny'
             ]);
             return http_response_code(400);
         }
-        if($response_json['id'] == "" || $response_json['courseid'] == "") {
+        if($response_json['id'] == "") {
             echo json_encode([
-                'error' => 'Nie podano identyfikatora ucznia'
+                'error' => 'Nie podano identyfikatora oceny'
             ]);
             return http_response_code(400);
         }
@@ -123,8 +123,8 @@ elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
                 ]);
                 return http_response_code(500);
             }
-            $query = $connection->prepare("DELETE FROM participants WHERE uuid = ? AND assigned_course = ?");
-            $query->bind_param("ss", $response_json['id'], $response_json['courseid']);
+            $query = $connection->prepare("DELETE FROM grades WHERE id = ?");
+            $query->bind_param("s", $response_json['id']);
             $query->execute();
             echo json_encode([
                 'status' => 'success'
@@ -135,5 +135,47 @@ elseif($_SERVER["REQUEST_METHOD"] == "PUT") {
     return http_response_code(501);
 }
 elseif($_SERVER["REQUEST_METHOD"] == "PATCH") {
-    return http_response_code(501);
+    if(!file_get_contents('php://input')) return http_response_code(400);
+        $response_json = json_decode(file_get_contents('php://input'), true);
+        if(!isset($response_json['grade']) || !isset($response_json['id'])) {
+            echo json_encode([
+                'error' => 'Wszystkie pola muszą być wypełnione'
+            ]);
+            return http_response_code(400);
+        }
+        if($response_json['grade'] == "" || $response_json['id'] == ""){
+            echo json_encode([
+                'error' => 'Wszystkie pola muszą być wypełnione'
+            ]);
+            return http_response_code(500);
+        }
+        if($response_json['grade'] < 1 || $response_json['grade'] > 6) {
+            echo json_encode([
+                'error' => 'Nieprawidłowa skala ocen'
+            ]);
+            return http_response_code(500);
+        }
+        else {
+            $connection = @new mysqli($hostname, $username, $password, $dbname);
+            if ($connection->connect_error) {
+                echo json_encode([
+                    'error' => 'Nie można połączyć się z serwerem bazy danych'
+                ]);
+                return http_response_code(500);
+            }
+            $query = $connection->prepare("UPDATE grades SET grade = ? WHERE id = ?");
+            $query->bind_param("is", $response_json['grade'], $response_json['id']);
+            if($query->execute()) {
+                echo json_encode([
+                    'status' => 'success'
+                ]);
+            } else {
+                echo json_encode([
+                    'status' => 'error',
+                    'error'=> 'Wystąpił błąd przy edytowaniu oceny'
+                ]);
+                return http_response_code(500);
+            }
+            $connection->close();
+        }
 }

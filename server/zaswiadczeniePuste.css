@@ -1,0 +1,235 @@
+body {
+    position: relative;
+	font-size: 8pt;
+}
+.stump-box {
+	width: 160pt;
+	justify-content: center;
+}
+.stump {
+	border-bottom: 1pt dotted black ;
+    width: 160pt;
+}
+.stump-text {
+	text-align: center;
+	font-size: 8pt;
+}
+.title-box {
+    text-align: center;
+	margin-top: 40pt;
+}
+.title-text {
+	font-size: 8pt;
+	font-weight: bold;
+}
+.title-description {
+	font-weight: bold;
+	font-size: 8pt;
+}
+.text-box {
+	position: relative;
+	font-size: 8pt;
+	margin-top: 20pt;
+	width: 100%;
+}
+.names {
+  float: left;
+}
+.names-surname {
+	float: right;
+    width: 81%;
+	border-bottom: 1px dotted black;
+	text-align: center;
+	font-weight: bold;
+	text-transform: capitalize;
+}
+.names-description {
+	text-align: center;
+	margin-top: 2pt;
+}
+.personal-information {
+	justify-content: space-between;
+	margin-top: 20pt;
+	position: relative;
+}
+.pi-description-birth-date{
+	width: 120pt;
+	float: left;
+	margin-left: 0pt;
+}
+.pi-description-birth-place{
+	width: 120pt;
+	float: left;
+	margin-left: 70pt;
+	text-align: center;
+}
+.pi-description-pesel{
+	width: 120pt;
+	float: left;
+	margin-left: 82pt;
+	text-align: center;
+}
+.birth-date {
+	border-bottom: 1pt dotted black;
+	width: 120pt;
+	text-align: center;
+	font-weight: bold;
+
+}
+.birth-place {
+	border-bottom: 1pt dotted black;
+	width: 120pt;
+	font-weight: bold;
+
+}
+.PESEL {
+	border-bottom: 1pt dotted black;
+	width: 120pt;
+	font-weight: bold;
+}
+.pi-description-text {
+	text-align: center;
+}
+.row-div {
+	margin-top: 10pt;
+	width: 100%;
+	justify-content: center;
+}
+.dots1{
+	float: left;
+	width: 34%;
+	border-bottom: 1px dotted black;
+	margin-top: 10pt;
+	font-weight: bold;
+}
+.dots2{
+	float: left;
+	border-bottom: 1px dotted black;
+	width: 100%;
+	margin-top: 8pt;
+	font-weight: bold;
+}
+.dots3{
+	float: left;
+	border-bottom: 1px dotted black;
+	margin-top: 10pt;
+	width: 90.899%;
+	font-weight: bold;
+}
+.dots4{
+	float: left;
+	border-bottom: 1px dotted black;
+	width: 100%;
+	margin-top: 10pt;
+	font-weight: bold;
+}
+.dots5{
+	float: left;
+	border-bottom: 1px dotted black;
+	width: 86.5%;
+	margin-top: 10pt;
+	margin-left: 2pt;
+	font-weight: bold;
+}
+.dots6{
+	float: left;
+	border-bottom: 1px dotted black;
+	width: 100%;
+	margin-top: 10pt;
+	font-weight: bold;
+}
+.place-information {
+	text-align: center;
+}
+.last-line-description {
+	width: 100%;
+	margin-top: 2pt;
+	justify-content: center;
+}
+.certificate-description {
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	margin-top: 25pt;
+}
+.current-date-place {
+	width: 200pt;
+	margin-top: 30pt;
+	margin-left: 150pt;
+	text-align: center;
+}
+.cdp-dots {
+	width: 200pt;
+	border-bottom: 1px dotted black;
+	font-weight: bold;
+}
+.nr-text{
+	float: left;
+	margin-right: 10pt;
+	width: 14.89pt;
+	text-align: center;
+}
+.nr-dots{
+	float: left;
+	width: 40pt;
+	margin-top: 8pt;
+	border-bottom: 1px dotted black;
+	font-weight: bold;
+	text-align: center;
+}
+.nr-text2{
+	float: left;
+	width: 6%;
+	margin-bottom: 18pt;
+	margin-top: -8pt;
+}
+.nr-dots2{
+	float: left;
+	width: 18pt;
+	border-bottom: 1px dotted black;
+	font-weight: bold;
+	text-align: left;
+	margin-top: 8pt;
+}
+.nr-text3{
+	float: left;
+	width: 10%;
+	text-align: left;
+	margin-top: -10pt;
+}
+.nr {
+	width: 250pt;
+	margin-top: 20pt;
+	text-align: center;
+}
+.stump-signature {
+	font-size: 8pt;
+	margin-left: 360pt;
+}
+.ss-dots {
+	border-bottom: 1px dotted black;
+	width: 160pt;
+}
+.ss-description {
+	width: 160pt;
+	text-align: center;
+}
+.footer {
+	margin-top: 210pt;
+}
+.line {
+	border-bottom: 1px solid black;
+	width: 200pt;
+	margin-bottom: 10pt;
+}
+.footer-text {
+	font-size: 8pt;
+	padding-bottom: 40pt;
+	padding-right: 20pt;
+}
+#box{
+    border-bottom: 100px solid black ;
+    width: 140pt;
+    height: 100pt;
+    background-color: rgb(113, 113, 163);
+}

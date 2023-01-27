@@ -60,7 +60,18 @@ function test() {
     ->fetch_assoc();
 
         //schools list
-        $query = $connection->prepare("SELECT * FROM schools");
+        $query = $connection->prepare("SELECT * FROM schools ORDER BY id ASC");
+        $query->execute();
+        $query->store_result();
+        $rows_schools = $query->num_rows;
+        $query->execute();
+        if($rows_schools < 1) {
+            $result_schools = [];
+        }
+        $result_schools = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+
+        //Subject list
+        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ? ORDER BY id ASC");
         $query->bind_param("s",  $uuid);
         $query->execute();
         $query->store_result();
@@ -71,26 +82,37 @@ function test() {
         }
         $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
-        //Subject list
-        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ?");
-        $query->bind_param("s",  $uuid);
+        //Grades list
+        $query = $connection->prepare("SELECT * FROM grades ORDER BY subject_id ASC");
         $query->execute();
         $query->store_result();
-        $rows_subjects = $query->num_rows;
+        $rows_grades = $query->num_rows;
         $query->execute();
-        if($rows_subjects < 1) {
-            $result_subjects = [];
+        if($rows_grades < 1) {
+            $result_grades = [];
         }
-        $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+        $result_grades = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
     $connection->close();
     $index = 1;
-    foreach ($result_participants as $participant) {
-        $html2 .= "<tr><td>{$index}</td><td style='text-transform: capitalize;'>".$participant['full_name']."</td><td>szkoła</td></tr>";
-        $index = $index + 1;
-    }
+    error_reporting(0);
     foreach($result_subjects as $subject) {
         $przedmioty_html .= "<td>".$subject['name']."</td>";
+    }
+    echo "<pre>";
+    print_r($result_subjects);
+    print_r($result_grades);
+    print_r($result_participants);
+    echo "</pre>";
+    foreach ($result_participants as $participant) {
+        $key = array_search($participant['school_id'], array_column($result_schools, 'id'));
+        foreach ($result_subjects as $subject) {
+            $grades = array_search($subject['id'], array_column($result_grades, 'subject_id'));
+            // $user_grade = array_search($participant['uuid'], array_column($grades, 'assigned_to_userid'));
+            echo $grade;
+        }
+        $html2 .= "<tr><td>{$index}</td><td style='text-transform: capitalize;'>".$participant['full_name']."</td><td>".$result_schools[$key]['name']."</td><td></td></tr>";
+        $index = $index + 1;
     }
     $html = '
     <div class="container">

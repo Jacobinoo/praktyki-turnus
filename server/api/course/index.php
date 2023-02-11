@@ -1,4 +1,11 @@
 <?php
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 require_once '/xampp/htdocs/praktyki-turnus/server/vendor/autoload.php';
 use Ramsey\Uuid\Uuid;
 session_start();
@@ -125,7 +132,7 @@ elseif($_SERVER["REQUEST_METHOD"] == "GET") {
             ]);
             return http_response_code(500);
         }
-        $query = $connection->prepare("SELECT * FROM courses ORDER BY code");
+        $query = $connection->prepare("SELECT * FROM courses ORDER BY start_date DESC");
         $query->execute();
         $result = $query->get_result();
         $result = $result->fetch_all(MYSQLI_ASSOC);
@@ -163,6 +170,12 @@ elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
         $query->bind_param("s", $response_json['id']);
         $query->execute();
         $query = $connection->prepare("DELETE FROM participants WHERE assigned_course = ?");
+        $query->bind_param("s", $response_json['id']);
+        $query->execute();
+        $query = $connection->prepare("DELETE FROM subjects WHERE assigned_to_courseid = ?");
+        $query->bind_param("s", $response_json['id']);
+        $query->execute();
+        $query = $connection->prepare("DELETE FROM grades WHERE assigned_to_courseid = ?");
         $query->bind_param("s", $response_json['id']);
         $query->execute();
         echo json_encode([

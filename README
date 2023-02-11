@@ -1,0 +1,17 @@
+1. Plik kwalifikacje.js to plik JavaScript który eksportuje całą bazę zawodów i ich symbolów cyfrowych w JSONie. Śmiało można go edytować, jednak prosimy o to, by robiła to osoba, która zna podstawy JSONa. Ostatnia aktualizacja bazy zawodów w tym pliku: 18 stycznia 2023r.
+
+2. Licencja znajduje się w pliku LICENSE, proszę go nie usuwać i nie modyfikować.
+
+3. Kopia zapasowa struktury bazy danych znajduje się w pliku z rozszerzeniem .sql. Wystarczy go zaimportować do phpMyAdmin.
+
+4. W razie utracenia kodu źródłowego, czy kopii zapasowych proszę o kontakt.
+
+5. Zmienne połączenia do bazy danych znajdują się w podfolderze server w pliku connect.php.
+
+6. Ścieżki API i serwera można edytować w pliku app.js. Zmienne nazywają się API_URL oraz SERVER_URL.
+
+7. Niektóre ścieżki (te na serwerze) są ustawione na twardo.
+
+8. Proszę pamiętać, że jest to pierwsza wersja aplikacji i może się pojawić w niej parę błędów/bugów. Gdyby tak się stało, najlepszym rozwiązaniem które działa w większości przypadków jest odświeżenie strony i wymuszenie czyszczenia pamięci podręcznej CTRL + F5.
+
+9. Baza danych powinna być zabezpieczona silnym hasłem, a szyfrowanie SSL powinno być włączone z uwagi na przetwarzanie danych wrażliwych tj. imię i nazwisko, PESEL, e-mail itd.

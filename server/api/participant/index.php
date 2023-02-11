@@ -1,4 +1,11 @@
 <?php
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 require_once '/xampp/htdocs/praktyki-turnus/server/vendor/autoload.php';
 use Ramsey\Uuid\Uuid;
 session_start();
@@ -114,6 +121,12 @@ elseif($_SERVER["REQUEST_METHOD"] == "DELETE") {
             $query = $connection->prepare("DELETE FROM participants WHERE uuid = ? AND assigned_course = ?");
             $query->bind_param("ss", $response_json['id'], $response_json['courseid']);
             $query->execute();
+
+            //delete grades
+            $query = $connection->prepare("DELETE FROM grades WHERE assigned_to_userid = ?");
+            $query->bind_param("s", $response_json['id']);
+            $query->execute();
+
             echo json_encode([
                 'status' => 'success'
             ]);

@@ -1,4 +1,11 @@
 <?php
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 session_start();
 header('Access-Control-Allow-Origin: http://127.0.0.1');
 header('Content-Type: application/json; charset=utf-8');

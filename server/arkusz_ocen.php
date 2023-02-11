@@ -1,4 +1,11 @@
 <?php
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 require_once __DIR__ . '/vendor/autoload.php';
 session_start();
 if(!isset($_SESSION['isLoggedIn']) || $_SESSION['isLoggedIn'] == "") {
@@ -32,7 +39,7 @@ function test() {
     if (!$connection) {
         die(json_encode(["error"=>mysqli_connect_error()]));
     }
-    $query = $connection->prepare("SELECT * FROM participants WHERE assigned_course = ?");
+    $query = $connection->prepare("SELECT * FROM participants WHERE assigned_course = ? ORDER BY full_name ASC");
     $query->bind_param("s", $uuid);
     $query->execute();
     $query->store_result();
@@ -41,7 +48,7 @@ function test() {
     if($rows < 1) {
         $connection->close();
         http_response_code(500);
-        exit('{"error": "Nie znaleziono ucznia"}');
+        exit('{"error": "Nie znaleziono uczniow"}');
     }
     $result_participants = $query->get_result()
     ->fetch_all(MYSQLI_ASSOC);
@@ -54,13 +61,13 @@ function test() {
     if($rows < 1) {
         $connection->close();
         http_response_code(500);
-        exit('{"error": "Nie znaleziono ucznia"}');
+        exit('{"error": "Nie znaleziono turnusu"}');
     }
     $course = $query->get_result()
     ->fetch_assoc();
 
         //schools list
-        $query = $connection->prepare("SELECT * FROM schools ORDER BY id ASC");
+        $query = $connection->prepare("SELECT * FROM schools");
         $query->execute();
         $query->store_result();
         $rows_schools = $query->num_rows;
@@ -71,7 +78,7 @@ function test() {
         $result_schools = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
         //Subject list
-        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ? ORDER BY id ASC");
+        $query = $connection->prepare("SELECT * FROM subjects WHERE assigned_to_courseid = ? ORDER BY name ASC");
         $query->bind_param("s",  $uuid);
         $query->execute();
         $query->store_result();
@@ -83,7 +90,13 @@ function test() {
         $result_subjects = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
         //Grades list
-        $query = $connection->prepare("SELECT * FROM grades ORDER BY subject_id ASC");
+        $query = $connection->prepare("SELECT grades.grade, subjects.name, grades.assigned_to_userid, grades.subject_id
+        FROM grades
+        INNER JOIN subjects
+        ON grades.subject_id = subjects.id
+        WHERE grades.assigned_to_courseid = ? AND subjects.assigned_to_courseid = ?
+        ORDER BY subjects.name ASC");
+        $query->bind_param("ss", $uuid, $uuid);
         $query->execute();
         $query->store_result();
         $rows_grades = $query->num_rows;
@@ -93,11 +106,29 @@ function test() {
         }
         $result_grades = $query->get_result()->fetch_all(MYSQLI_ASSOC);
 
+        //Conduct grades list
+        $query = $connection->prepare("SELECT *
+        FROM grades
+        WHERE assigned_to_courseid = ? AND is_conduct_grade = 1");
+        $query->bind_param("s", $uuid);
+        $query->execute();
+        $query->store_result();
+        $rows_c_grades = $query->num_rows;
+        $query->execute();
+        if($rows_c_grades < 1) {
+            $result_c_grades = [];
+        }
+        $result_c_grades = $query->get_result()->fetch_all(MYSQLI_ASSOC);
+       
+
     $connection->close();
     $index = 1;
     error_reporting(0);
     foreach($result_subjects as $subject) {
         $przedmioty_html .= "<td>".$subject['name']."</td>";
+    }
+    if($przedmioty_html == "") {
+        $przedmioty_html = "<td>Nie znaleziono przedmiotów</td>";
     }
     echo "<pre>";
     print_r($result_subjects);
@@ -105,13 +136,63 @@ function test() {
     print_r($result_participants);
     echo "</pre>";
     foreach ($result_participants as $participant) {
-        $key = array_search($participant['school_id'], array_column($result_schools, 'id'));
-        foreach ($result_subjects as $subject) {
-            $grades = array_search($subject['id'], array_column($result_grades, 'subject_id'));
-            // $user_grade = array_search($participant['uuid'], array_column($grades, 'assigned_to_userid'));
-            echo $grade;
+        $key_school = array_search($participant['school_id'], array_column($result_schools, 'id'));
+        $key_grade = array_search($participant['uuid'], array_column($result_grades, 'assigned_to_userid'));
+        $subject_grades_inner_html = '';
+        if($result_subjects == []) {
+            $subject_grades_inner_html .= "<td>n/a</td>";
         }
-        $html2 .= "<tr><td>{$index}</td><td style='text-transform: capitalize;'>".$participant['full_name']."</td><td>".$result_schools[$key]['name']."</td><td></td></tr>";
+        foreach ($result_subjects as $subject) {
+            $subject_one = '';
+            foreach($result_grades as $grade) {
+                if($grade['subject_id'] == $subject['id'] && $grade['assigned_to_userid'] == $participant['uuid']) {
+                    $subject_one = "<td>".$grade['grade']."</td>";
+                    $subject_grades_inner_html .= $subject_one;
+                }
+            }
+            if($subject_one == "") {
+                $subject_grades_inner_html .= "<td>--</td>";
+            }
+            // $key = array_search($subject['name'], array_column($result_grades, 'name'));
+            // if($key == "") {
+            //     $subject_grades_inner_html .= "<td>n/a</td>";
+            // } else {
+            //     $subject_grades_inner_html .= '<td>'.$result_grades[$key]['grade'].'</td>';
+            // }
+            // if($subject_grades_inner_html == "") {
+            //     $subject_grades_inner_html = "<td>n/a</td>";
+            // }
+        }
+        $c_grades_inner_html = '';
+        $key_c_grade = array_search($participant['uuid'], array_column($result_c_grades, 'assigned_to_userid'));
+        if($key_c_grade == "") {
+            $c_grades_inner_html = '<td>- -</td>';
+        } else {
+            switch ($result_c_grades[$key_c_grade]['grade']) {
+                case 1:
+                    $c_grades_inner_html = '<td>naganne</td>';
+                    break;
+                case 2:
+                    $c_grades_inner_html = '<td>nieodpowiednie</td>';
+                    break;
+                case 3:
+                    $c_grades_inner_html = '<td>poprawne</td>';
+                    break;   
+                case 4:
+                    $c_grades_inner_html = '<td>dobre</td>';
+                    break;   
+                case 5:
+                    $c_grades_inner_html = '<td>bardzo dobre</td>';
+                    break;   
+                case 6:
+                    $c_grades_inner_html = '<td>wzorowe</td>';
+                    break;
+                default:
+                    $c_grades_inner_html = '<td>n/a</td>';
+                    break;
+            }
+        }
+        $html2 .= "<tr><td>{$index}</td><td style='text-transform: capitalize;'>".$participant['full_name']."</td><td>".$result_schools[$key_school]['name']."</td>".$subject_grades_inner_html.$c_grades_inner_html."</tr>";
         $index = $index + 1;
     }
     $html = '
@@ -130,7 +211,7 @@ function test() {
                 <th>Zachowanie</th>
             </tr>
             <tr>
-            '.$przedmioty_html.'<td>zachowanie</td>
+            '.$przedmioty_html.'<td>Zachowanie</td>
             </tr>
             </thead>
         <tbody>

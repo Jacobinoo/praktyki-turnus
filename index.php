@@ -1,4 +1,12 @@
 <?php
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
+//Turnusy: JQuery is not covered by the software license. Jquery is open-source and is licensed under MIT License. Fonts, icons are also not covered. More on that inside LICENSE file.
 session_start();
 if(isset($_SESSION['isLoggedIn']) && $_SESSION['isLoggedIn'] == true) {
   header('Location: ./app/panel.php');
@@ -18,6 +26,7 @@ if(isset($_SESSION['isLoggedIn']) && $_SESSION['isLoggedIn'] == true) {
     <title>Turnus - zaloguj się</title>
 </head>
 <body>
+    <span id="about">Info</span>
     <div class="card">
         <div class="header">
             <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-mortarboard-fill" viewBox="0 0 16 16">
@@ -29,12 +38,12 @@ if(isset($_SESSION['isLoggedIn']) && $_SESSION['isLoggedIn'] == true) {
         <div class="form">
             <span for="input-wrapper">Podaj kod logowania</span>
             <div id="input-wrapper">
-                <input type="phone" class="code-input" maxlength="1" />
-                <input type="phone" class="code-input" maxlength="1" />
-                <input type="phone" class="code-input" maxlength="1" />
-                <input type="phone" class="code-input" maxlength="1" />
-                <input type="phone" class="code-input" maxlength="1" />
-                <input type="phone" class="code-input" maxlength="1" />
+                <input type="tel" class="code-input" maxlength="1" />
+                <input type="tel" class="code-input" maxlength="1" />
+                <input type="tel" class="code-input" maxlength="1" />
+                <input type="tel" class="code-input" maxlength="1" />
+                <input type="tel" class="code-input" maxlength="1" />
+                <input type="tel" class="code-input" maxlength="1" />
             </div>
             <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
             <span style="display: none;" id="error-label"></span>

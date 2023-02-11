@@ -1,3 +1,10 @@
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 const replaceLastNChars = function(str, replace, num) {
   return str.slice(0, -num) + Array(num + 1).join(replace);
 };
@@ -38,6 +45,7 @@ export function schoolList(schoolsData){
 <div style="display: flex; gap: 5px;">
 <div class="add-school-btn">Dodaj</div>
 </div>
+<span style="text-align: center; margin-bottom: 2px; font-size: 13px; color: gray; font-weight: 700;">Przed usunięciem jakiejś szkoły upewnij się, że żaden uczeń nie jest do niej podłączony!</span>
 <table>
 <thead>
   <tr>
@@ -86,7 +94,7 @@ export function newCourseForm() {
   <h3 class="new-course-form-content-section-title">Informacje podstawowe</h3>
   <h4 id="name">Podaj kod zawodu, aby pokazać nazwę</h4>
   <div class="new-course-form-content-info-wrapper">
-    <input type="phone" maxlength="6" placeholder="Kod zawodu" class="new-course-form-content-input" id="code">
+    <input type="tel" maxlength="6" placeholder="Kod zawodu" class="new-course-form-content-input" id="code">
     <input type="text" placeholder="Klasa (np. IV)" class="new-course-form-content-input" id="class">
   </div>
   <h3 class="new-course-form-content-section-title">Termin realizacji</h3>
@@ -110,7 +118,7 @@ export function newParticipantForm(schoolsList) {
   <div class="new-participant-form-content-info-wrapper">
     <input type="text" placeholder="Imię i nazwisko" class="new-participant-form-content-input" id="fullname">
     <input type="text" placeholder="Miejsce urodzenia (np. Kielce)" class="new-participant-form-content-input" id="birthplace">
-    <input type="phone" placeholder="PESEL" class="new-participant-form-content-input" id="pesel" maxlength="11">
+    <input type="tel" placeholder="PESEL" class="new-participant-form-content-input" id="pesel" maxlength="11">
     <input type="text" placeholder="Adres e-mail ucznia" class="new-participant-form-content-input" id="email">
     <textarea placeholder="Adres zamieszkania: np. ul. Mickiewicza 10/3. 28-200 Staszów" id="address" rows="3"></textarea>
     <label for="birthdate">Data urodzenia</label>
@@ -140,7 +148,7 @@ export function newSubjectForm(){
 <div class="new-participant-form-content">
   <div class="new-subject-form-content-info-wrapper">
     <input type="text" placeholder="Nazwa przedmiotu" class="new-participant-form-content-input" id="subject-name">
-    <input type="phone" placeholder="Wymiar godzin" class="new-participant-form-content-input" id="subject-range-hours">
+    <input type="tel" placeholder="Wymiar godzin" class="new-participant-form-content-input" id="subject-range-hours">
   </div>
   <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
   <span style="display: none;" id="error-label"></span>
@@ -157,7 +165,6 @@ export function renderCourseDetailsView(courseData) {
       <span>Kod: <b>${courseData.code}</b></span>
       <span>Termin: <b>${courseData.startDate} - ${courseData.endDate}</b></span>
       <span>Klasa: <b>${courseData.class}</b></span>
-      <span>Status: <b>Aktywny</b></span>
       </div>
     </div>
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
@@ -169,7 +176,7 @@ export function renderCourseDetailsView(courseData) {
     <h2>Uczniowie</h2>
     <div style="display: flex;gap: 5px;">
     <div class="course-details-content-section-btn">Dodaj ucznia</div>
-    <div class="course-details-content-all-participants-btn" title="Pokaż zestawienie wyników klasyfikacji">Zestawienie ocen</div>
+    ${courseData.participants == "" ? ``:`<div class="course-details-content-all-participants-btn" title="Pokaż zestawienie wyników klasyfikacji">Zestawienie ocen</div>`}
     </div>
     ${participantsTable(courseData.participants)}
     </div>
@@ -280,7 +287,7 @@ function subjectsRows(subjects) {
 
 
 }
-export function newGradeForm(isConductGrade = false, subjectsList){
+export function newGradeForm(isConductGrade = false, subjectsList, conduct_grade = null){
   if(isConductGrade == false) {
     return `<div class="new-grade-form-header">Dodawanie oceny<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
@@ -302,7 +309,7 @@ export function newGradeForm(isConductGrade = false, subjectsList){
       </select>
     </div>
     <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-    <span style="display: none;" id="error-label"></span>
+    <span style="display: none;" id="error-label-addgrade"></span>
     <div class="new-grade-form-add-grade-btn">Dodaj ocenę</div>
   </div>`
   } else {
@@ -312,13 +319,13 @@ export function newGradeForm(isConductGrade = false, subjectsList){
   <div class="new-conduct-grade-form-content">
     <div class="new-conduct-grade-form-wrapper">
       <select id="conduct-grade" class="new-grade-form-select" required>
-        <option value="" disabled selected>Wybierz ocenę</option>
-        <option value="6">wzorowe</option>
-        <option value="5">bardzo dobre</option>
-        <option value="4">dobre</option>
-        <option value="3">poprawne</option>
-        <option value="2">nieodpowiednie</option>
-        <option value="1">naganne</option>
+        <option value="" ${conduct_grade == "" ? "selected" : ""} disabled>Wybierz ocenę</option>
+        <option value="6" ${conduct_grade == 6 ? "selected" : ""}>wzorowe</option>
+        <option value="5" ${conduct_grade == 5 ? "selected" : ""}>bardzo dobre</option>
+        <option value="4" ${conduct_grade == 4 ? "selected" : ""}>dobre</option>
+        <option value="3" ${conduct_grade == 3 ? "selected" : ""}>poprawne</option>
+        <option value="2" ${conduct_grade == 2 ? "selected" : ""}>nieodpowiednie</option>
+        <option value="1" ${conduct_grade == 1 ? "selected" : ""}>naganne</option>
       </select>
     </div>
     <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
@@ -334,8 +341,9 @@ export function newGradeForm(isConductGrade = false, subjectsList){
     return html
   }
 }
-export function editGradeForm(currentGrade, id){
-  return `<div class="new-grade-form-header">Edycja oceny<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+export function editGradeForm(currentGrade, id, is_conduct_grade = false){
+  if(is_conduct_grade == false) {
+    return `<div class="new-grade-form-header">Edycja oceny<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
     <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
   </svg></div>
   <div class="new-grade-form-content">
@@ -354,9 +362,30 @@ export function editGradeForm(currentGrade, id){
     <span style="display: none;" id="error-label"></span>
     <div class="edit-grade-form-edit-btn" data-id="${id}">Zapisz</div>
   </div>`
+  } else {
+    return `<div class="new-grade-form-header">Edycja oceny z zachowania<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+  </svg></div>
+  <div class="new-grade-form-content">
+    <div class="new-grade-form-wrapper">
+      <select id="conduct-grade" class="new-grade-form-select" required>
+      <option value="" disabled>Wybierz ocenę z listy</option>
+        <option value="6" ${currentGrade == 6 ? "selected" : ""}>wzorowe</option>
+        <option value="5" ${currentGrade == 5 ? "selected" : ""}>bardzo dobre</option>
+        <option value="4" ${currentGrade == 4 ? "selected" : ""}>dobre</option>
+        <option value="3" ${currentGrade == 3 ? "selected" : ""}>poprawne</option>
+        <option value="2" ${currentGrade == 2 ? "selected" : ""}>nieodpowiednie</option>
+        <option value="1" ${currentGrade == 1 ? "selected" : ""}>naganne</option>
+      </select>
+    </div>
+    <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+    <span style="display: none;" id="error-label"></span>
+    <div class="edit-conduct-grade-form-edit-btn">Zapisz</div>
+  </div>`
+  }
 }
 
-export function renderParticipantDetailsView(data, schoolsList, participantId, subjectsList) {
+export function renderParticipantDetailsView(data, schoolsList, participantId, subjectsList, courseName) {
   let grades = data.grades.filter(x => x.assigned_to_userid == participantId);
   let data_ = data.participants.find(x => x.uuid == participantId)
   return `
@@ -381,13 +410,14 @@ export function renderParticipantDetailsView(data, schoolsList, participantId, s
     <h2>Oceny</h2>
     <div class="participant-details-add-grade-btn">Dodaj ocenę</div>
     ${gradesTable(grades)}
-    <div class="conduct-grade-box">Ocena z zachowania:<div class="conduct-grade"></div>
-    <div class="conduct-grade-btn"></div>
     </div>
     </div>
     <div class="participant-details-content-section">
     <h2>Opcje</h2>
+    <div style="display: flex; gap: 5px;">
+    <div data-id="${participantId}" class="download-certificate-btn" style="width: max-content; padding: 5px; padding-left: 12px; padding-right: 12px; display: flex; align-items: center; border-radius: 8px; height: auto; font-size: 14px;" data-p="${data_.pesel}" data-name="${courseName}" title="Pokaż zaświadczenie tego ucznia">Pokaż zaświadczenie ucznia</div>
     <div class="participant-delete-btn">Usuń ucznia</div>
+    </div>
     </div>
     
     </div>`;
@@ -397,7 +427,33 @@ export function renderParticipantDetailsView(data, schoolsList, participantId, s
 function gradesRows() {
   let html = ``
   console.log("grades",grades)
+  let conduct_grade = {};
   grades.forEach(grade => {
+    if(grade.is_conduct_grade == 1) {
+      conduct_grade.grade = grade.grade
+      conduct_grade.desc = ``
+      switch (conduct_grade.grade) {
+        case "1":
+          conduct_grade.desc = "naganne"
+          break;
+          case "2":
+            conduct_grade.desc = "nieodpowiednie"
+          break;
+          case "3":
+            conduct_grade.desc = "poprawne"
+          break;
+          case "4":
+            conduct_grade.desc = "dobre"
+          break;
+          case "5":
+            conduct_grade.desc = "bardzo dobre"
+          break;
+          case "6":
+            conduct_grade.desc = "wzorowe"
+          break;
+      };
+      return;
+    }
     html = html + `
     <tr>
       <td style="cursor: pointer;" data-id="${grade.id}" data-grade="${grade.grade}" class="participant-grade-edit-icon-click" title="Edycja oceny" ><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" class="bi bi-pen participant-grade-edit-icon participant-grade-edit-icon-click" viewBox="0 0 16 16" data-id="${grade.id}" data-grade="${grade.grade}" >
@@ -410,21 +466,54 @@ function gradesRows() {
     `
   });
   if(html == ``) {
-    return `<h3 class="grayed-caption">Brak ocen</h3>`
+    if(conduct_grade.grade == undefined) {
+      return `<h3 class="grayed-caption">Brak ocen</h3>
+      <div class="conduct-grade-box">Ocena z zachowania:<div class="conduct-grade" data-grade=""></div>
+  <div class="conduct-grade-btn"></div>
+      `
+    } else {
+      return `<h3 class="grayed-caption">Brak ocen</h3>
+      <div class="conduct-grade-box">Ocena z zachowania:<div class="conduct-grade" data-grade="${conduct_grade.grade}">${conduct_grade.desc != `` ? `${conduct_grade.desc}`: `${conduct_grade.grade}`}</div>
+  <div class="conduct-grade-btn"></div>
+      `
+    }
   }
-  return `<table>
-  <thead>
-    <tr>
-      <th>Edycja</th>
-      <th>Nazwa zajęć</th>
-      <th>Ocena</th>
-      <th>Usuwanie</th>
-    </tr>
-  </thead>
-  <tbody>
-    ${html}
-  </tbody>
-</table>`
+  if(conduct_grade.grade == undefined) {
+    return `<table>
+    <thead>
+      <tr>
+        <th>Edycja</th>
+        <th>Nazwa zajęć</th>
+        <th>Ocena</th>
+        <th>Usuwanie</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${html}
+    </tbody>
+  </table>
+  <div class="conduct-grade-box">Ocena z zachowania:<div class="conduct-grade" data-grade=""></div>
+  <div class="conduct-grade-btn"></div>
+  `
+  } else {
+
+    return `<table>
+    <thead>
+      <tr>
+        <th>Edycja</th>
+        <th>Nazwa zajęć</th>
+        <th>Ocena</th>
+        <th>Usuwanie</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${html}
+    </tbody>
+  </table>
+  <div class="conduct-grade-box">Ocena z zachowania:<div class="conduct-grade" data-grade="${conduct_grade.grade}">${conduct_grade.desc != `` ? `${conduct_grade.desc}`: `${conduct_grade.grade}`}</div>
+  <div class="conduct-grade-btn"></div>
+  `
+  }
 }
     }
 }

@@ -1,3 +1,10 @@
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap");
 :root {
   font-family: "Inter", sans-serif;
@@ -408,6 +415,11 @@ textarea {
 #content > #error-label {
   margin-top: 50px;
 }
+#error-label-addgrade {
+  color: var(--error);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
 .add-course-btn {
   height: auto;
   width: auto;
@@ -553,6 +565,8 @@ textarea {
     -webkit-box-shadow: 0px 0px 13px -1px var(--card-shadow);
     -moz-box-shadow: 0px 0px 13px -1px var(--card-shadow);
     box-shadow: 0px 0px 13px -1px var(--card-shadow);
+    margin-top: 40px;
+    margin-bottom: 40px;
 }
 .course-details-header {
     display: flex;
@@ -1063,6 +1077,21 @@ background-color: var(--btn-hover);
 .edit-grade-form-edit-btn:hover{
 background-color: var(--btn-hover);
 }
+.edit-conduct-grade-form-edit-btn{
+  height: auto;
+  width: auto;
+  background-color: var(--btn);
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  user-select: none;
+}
+.edit-conduct-grade-form-edit-btn:hover{
+background-color: var(--btn-hover);
+}
 .conduct-grade-box{
   display: flex;
   align-items: center;
@@ -1070,6 +1099,8 @@ background-color: var(--btn-hover);
 }
 .conduct-grade{
   font-weight: 600;
+  margin-left: 10px;
+  font-size: 18px;
 }
 .conduct-grade-btn{
   width: fit-content;

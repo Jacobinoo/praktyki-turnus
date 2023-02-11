@@ -1,15 +1,32 @@
+/****************************/
+/* Copyright 2023.
+/* Owners: Jakub Banasiewicz, Patryk Kubik.
+/* Permission granted for Zespół Szkoł im. Stanisława Staszica Koszarowa 7 28-200 Staszów, Poland.
+/* More info inside LICENSE file.
+/****************************/
+
 import { newCourseForm, newParticipantForm, renderCourseDetailsView, renderParticipantDetailsView, newGradeForm, editGradeForm, schoolList, newSchoolForm, newSubjectForm} from "./functions.js";
+
+//!!
+const API_URL = "http://localhost/praktyki-turnus/server/api"
+const SERVER_URL ="http://localhost/praktyki-turnus/server"
+//!!
+
 
 //Kwalifikacje - symbole cyfrowe JSON
 import kwalifikacje from './kwalifikacje.js'
+//
 const body = document.querySelector("body");
 const courseList = document.querySelector("#content");
 const addBtn = document.querySelector(".add-btn");
 const mainUI_List = document.querySelector("#container");
 const logoutBtn = document.querySelector(".logout-btn");
+//Curtain
+const curtain = document.querySelector(".curtain");
 
 let courseId = null;
 let courseCode = null;
+let currentCourseName = null;
 let participantId = null;
 let participantsData = null;
 let currentCourseSubjectList = [{}]
@@ -23,11 +40,26 @@ let schoolsList = [{}]
 let allowMeToCheckSchoolList = false
 let addSchoolFormOpen = false
 
+let curtainObserver = new MutationObserver(function (e) {
+  let a;
+  if (a = e.find(x => x.target == curtain)) {
+    if(a.target.style.display == "flex") {
+      console.info("Curtain showed on the screen")
+      body.style.overflow = "hidden"
+    } else {
+      console.info("Curtain hidden")
+      body.style.overflow = null
+    }
+  }
+})
+curtainObserver.observe(curtain, {
+  attributes: true
+})
 
 fetchSchools()
 async function fetchSchools(openSchoolList) {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/schools/",
+    `${API_URL}/schools/`,
     {
       method: "GET",
       headers: {
@@ -61,8 +93,6 @@ async function fetchSchools(openSchoolList) {
 
 
 
-//Curtain
-const curtain = document.querySelector(".curtain");
 //School list
 document.querySelector(".school-btn").addEventListener("click", function(e){
   return UI_showSchoolList()
@@ -116,7 +146,7 @@ async function createSchool(name, address) {
   addBtn.style.display = "none"
   loadingRing.style.display = "inline-block"
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/schools/",
+    `${API_URL}/schools/`,
     {
       method: "POST",
       headers: {
@@ -159,21 +189,21 @@ document.querySelector('body').addEventListener("click", function(e){
   if(!e.target.classList.contains('course-details-content-all-participants-btn')) {
     return
   }
-  return window.open(`http://localhost/praktyki-turnus/server/arkusz_ocen.php?id=${courseId}&name=${kwalifikacje[courseCode].name}`,'_blank')
+  return window.open(`${SERVER_URL}/arkusz_ocen.php?id=${courseId}&name=${kwalifikacje[courseCode].name}`,'_blank')
 })
 
 document.querySelector('body').addEventListener("click", function(e){
   if(!e.target.classList.contains('course-details-content-empty-certificate-btn')) {
     return
   }
-  return window.open(`http://localhost/praktyki-turnus/server/zaswiadczeniePuste.php`)
+  return window.open(`${SERVER_URL}/zaswiadczeniePuste.php`)
 })
 
 document.querySelector('body').addEventListener("click", function(e){
   if(!e.target.classList.contains('download-certificate-btn')) {
     return
   }
-  return window.open(`http://localhost/praktyki-turnus/server/zaswiadczenie.php?id=${e.target.dataset.id}&p=${e.target.dataset.p}&name=${e.target.dataset.name}`,'_blank')
+  return window.open(`${SERVER_URL}/zaswiadczenie.php?id=${e.target.dataset.id}&p=${e.target.dataset.p}&name=${e.target.dataset.name}`,'_blank')
 })
 
 
@@ -239,25 +269,37 @@ document.querySelector('body').addEventListener('click', function (e) {
   if(!e.target.classList.contains('edit-grade-form-edit-btn')) {
     return;
   }
-  editGradeServer(e.target.dataset.id, document.querySelector('#grade').value)
+  editGradeServer(e.target.dataset.id, document.querySelector('#grade').value, false)
 })
 
-async function editGradeServer(id, grade) {
-  const addBtn = document.querySelector('.edit-grade-form-edit-btn')
+document.querySelector('body').addEventListener('click', function (e) {
+  if(!e.target.classList.contains('edit-conduct-grade-form-edit-btn')) {
+    return;
+  }
+  editGradeServer(null, document.querySelector('#conduct-grade').value, true)
+})
+
+async function editGradeServer(id, grade, isConduct = false) {
+  let addBtn = null;
+  if(isConduct == true) {
+    addBtn = document.querySelector('.edit-conduct-grade-form-edit-btn')
+  } else {
+    addBtn = document.querySelector('.edit-grade-form-edit-btn')
+  }
   const errMsg = document.querySelector('.edit-grade-form > .new-grade-form-content > #error-label')
   const loadingRing = document.querySelector('.edit-grade-form > .new-grade-form-content > .lds-ring')
   if(errMsg.textContent !== "") errMsg.textContent = ""
   addBtn.style.display = "none"
   loadingRing.style.display = "inline-block"
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/grades/",
+    `${API_URL}/grades/`,
     {
       method: "PATCH",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: `{"id":"${id}","grade":"${grade}"}`,
+      body: `{"id":"${id}","grade":"${grade}", "is_conduct_grade":"${isConduct}", "userid":"${participantId}"}`,
     }
   );
   response
@@ -286,10 +328,10 @@ async function editGradeServer(id, grade) {
     });
 }
 
-function UI_showNewGradeForm(isConductGrade = false){
+function UI_showNewGradeForm(isConductGrade = false, conduct_grade = null){
   curtain.style.display = "flex";
   const form = document.createElement("div");
-  form.innerHTML = newGradeForm(isConductGrade, currentCourseSubjectList);
+  form.innerHTML = newGradeForm(isConductGrade, currentCourseSubjectList, conduct_grade);
   form.className = "new-grade-form";
   curtain.appendChild(form);
   form
@@ -301,12 +343,12 @@ function UI_showNewGradeForm(isConductGrade = false){
     });
 }
 
-function UI_showEditGradeForm(grade, id){
+function UI_showEditGradeForm(grade, id, isConduct = false){
   if(isEditGradeFormOpen == true) { return }
   isEditGradeFormOpen = true
   curtain.style.display = "flex";
   const form = document.createElement("div");
-  form.innerHTML = editGradeForm(grade,id);
+  form.innerHTML = editGradeForm(grade,id, isConduct);
   form.className = "edit-grade-form";
   curtain.appendChild(form);
   form
@@ -325,7 +367,7 @@ logoutBtn.addEventListener("click", function () {
   logout();
   async function logout() {
     const response = await fetch(
-      "http://localhost/praktyki-turnus/server/api/logout/",
+      `${API_URL}/logout/`,
       {
         method: "GET",
         headers: {
@@ -375,7 +417,7 @@ async function createCourse(code, name, _class, startDate, endDate) {
   addBtn.style.display = "none"
   loadingRing.style.display = "inline-block"
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/course/",
+    `${API_URL}/course/`,
     {
       method: "POST",
       headers: {
@@ -391,6 +433,7 @@ async function createCourse(code, name, _class, startDate, endDate) {
       if (response.status !== 200) throw `${data.error}`;
       if (data.status == "success") {
         createCourseComponent(true, data.uuid, _class, code, (new Date(startDate)).toLocaleDateString('pl-pl'), (new Date(endDate)).toLocaleDateString('pl-pl'), 1)
+        document.querySelector('#empty-label').style.display = "none";
         curtain.style.display = "none"
         curtain.replaceChildren()
         isAddCourseFormOpen = false
@@ -411,7 +454,7 @@ async function createCourse(code, name, _class, startDate, endDate) {
 fetchAllCourses()
 async function fetchAllCourses() {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/course/",
+    `${API_URL}/course/`,
     {
       method: "GET",
       headers: {
@@ -436,21 +479,13 @@ async function fetchAllCourses() {
             startDateParts[0],
             startDateParts[1] - 1,
             startDateParts[2].substr(0, 2)
-          ).toLocaleDateString("pl-pl", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-          });
+          ).toLocaleDateString('pl-pl');
           const endDateParts = course.end_date.split("-");
           const endDate = new Date(
             endDateParts[0],
             endDateParts[1] - 1,
             endDateParts[2].substr(0, 2)
-          ).toLocaleDateString("pl-pl", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-          });
+          ).toLocaleDateString('pl-pl');
           createCourseComponent(false, course.uuid, course.class, course.code, startDate, endDate, course.status)
         });
       } else {
@@ -475,9 +510,6 @@ function createCourseComponent(onTheTop = false, uuid, _class, code, startDate, 
     <div class="code course-click-listener" data-id='${uuid}'>${code}</div>
     <div class="date course-click-listener" data-id='${uuid}'>${startDate} - ${endDate}</div>
     <div class="date course-click-listener" data-id='${uuid}'>Klasa ${_class}</div>
-    <div class="status course-click-listener" data-id='${uuid}'><span class="status-text course-click-listener" data-id='${uuid}'>${
-    status ? "Aktywny" : "Nieaktywny"
-  }</span></div>
   </div>`;
   courseComponent.className = "course course-click-listener";
   courseComponent.dataset.id = uuid;
@@ -554,7 +586,7 @@ function UI_showNewSubjectForm() {
 
 async function deleteCourse(id) {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/course/",
+    `${API_URL}/course/`,
     {
       method: "DELETE",
       headers: {
@@ -593,7 +625,7 @@ async function deleteCourse(id) {
 
 async function deleteParticipant(id) {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/participant/",
+    `${API_URL}/participant/`,
     {
       method: "DELETE",
       headers: {
@@ -626,7 +658,7 @@ async function deleteParticipant(id) {
 
 async function deleteSchool(id) {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/schools/",
+    `${API_URL}/schools/`,
     {
       method: "DELETE",
       headers: {
@@ -657,7 +689,7 @@ async function deleteSchool(id) {
 
 async function deleteSubject(id, courseId) {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/subjects/",
+    `${API_URL}/subjects/`,
     {
       method: "DELETE",
       headers: {
@@ -688,7 +720,7 @@ async function deleteSubject(id, courseId) {
 
 async function deleteGrade(id) {
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/grades/",
+    `${API_URL}/grades/`,
     {
       method: "DELETE",
       headers: {
@@ -729,7 +761,7 @@ async function createParticipant(full_name, birth_place, pesel, email, address, 
   addBtn.style.display = "none"
   loadingRing.style.display = "inline-block"
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/participant/",
+    `${API_URL}/participant/`,
     {
       method: "POST",
       headers: {
@@ -772,7 +804,7 @@ async function createSubjectServer(name, hours) {
   addBtn.style.display = "none"
   loadingRing.style.display = "inline-block"
   const response = await fetch(
-    "http://localhost/praktyki-turnus/server/api/subjects/",
+    `${API_URL}/subjects/`,
     {
       method: "POST",
       headers: {
@@ -824,9 +856,13 @@ document.querySelector("body").addEventListener("click", function (e) {
     isAddGradeFormOpen = true
     UI_showNewGradeForm()
   } else if (e.target.classList.contains("conduct-grade-btn")) {
-    if(isAddGradeFormOpen == true) return;
-    isAddGradeFormOpen = true
-    UI_showNewGradeForm(true)
+    if(e.target.innerText == "Dodaj") {
+      if(isAddGradeFormOpen == true) return;
+      isAddGradeFormOpen = true
+      UI_showNewGradeForm(true, document.querySelector('.conduct-grade').dataset.grade)
+    } else {
+      UI_showEditGradeForm(document.querySelector('.conduct-grade').dataset.grade, null, true)
+    }
   }
 });
 
@@ -899,25 +935,49 @@ document.querySelector('body').addEventListener('click', function (e) {
   if(!e.target.classList.contains('new-grade-form-add-grade-btn')) {
     return;
   }
-  addGrade(document.querySelector('#subject-id').value, document.querySelector('#grade').value)
+  addGrade(document.querySelector('#subject-id').value, document.querySelector('#grade').value, false)
 })
 
-async function addGrade(subject, grade) {
-    const addBtn = document.querySelector('.new-grade-form-add-grade-btn')
-    const errMsg = document.querySelector('.new-grade-form-content > #error-label')
-    const loadingRing = document.querySelector('.new-grade-form-content > .lds-ring')
+document.querySelector('body').addEventListener('click', function (e) {
+  if(!e.target.classList.contains('new-conduct-grade-form-add-grade-btn')) {
+    return;
+  }
+  addGrade(null, document.querySelector('#conduct-grade').value, true)
+})
+
+document.querySelector('body').addEventListener('click', function (e) {
+  if(!e.target.classList.contains('new-conduct-grade-form-edit-grade-btn')) {
+    return;
+  }
+  addGrade(null, document.querySelector('#conduct-grade').value, true)
+})
+
+async function addGrade(subject, grade, is_conduct_grade = false) {
+  let addBtn = null;
+  let loadingRing = null;
+  let errMsg = null;
+    if(is_conduct_grade == true) {
+      addBtn = document.querySelector('.new-conduct-grade-form-add-grade-btn')
+      errMsg = document.querySelector('.new-conduct-grade-form-content > #error-label')
+      loadingRing = document.querySelector('.new-conduct-grade-form-content > .lds-ring')
+    } else {
+      addBtn = document.querySelector('.new-grade-form-add-grade-btn');
+      loadingRing = document.querySelector('.new-grade-form-content > .lds-ring');
+      errMsg = document.getElementById("error-label-addgrade");
+    }
     if(errMsg.textContent !== "") errMsg.textContent = ""
     addBtn.style.display = "none"
     loadingRing.style.display = "inline-block"
+    console.log(is_conduct_grade)
     const response = await fetch(
-      "http://localhost/praktyki-turnus/server/api/grades/",
+      `${API_URL}/grades/`,
       {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: `{"subject_id":"${subject}","grade":"${grade}","userid":"${participantId}"}`,
+        body: `{"subject_id":"${subject}","grade":"${grade}","userid":"${participantId}", "is_conduct_grade":"${is_conduct_grade == true ? '1' : '0'}","assigned_to_courseid":"${courseId}"}`,
       }
     );
     response
@@ -950,7 +1010,7 @@ async function UI_redirectParticipantView() {
   console.log(`redirecting to participant ${participantId}`)
   const UI = document.createElement("div");
   UI.className = "participant-details";
-  UI.innerHTML = renderParticipantDetailsView(participantsData, schoolsList, participantId, currentCourseSubjectList)
+  UI.innerHTML = renderParticipantDetailsView(participantsData, schoolsList, participantId, currentCourseSubjectList, currentCourseName)
   mainUI_List.style.display = "none";
   body.appendChild(UI);
   document.querySelector(".conduct-grade").innerText == "" ? document.querySelector(".conduct-grade-btn").innerText = "Dodaj" : document.querySelector(".conduct-grade-btn").innerText = "Zmień"
@@ -967,7 +1027,7 @@ async function UI_redirectParticipantView() {
 async function UI_redirectDetailsView(onlyUpdateVariables = false) {
   let courseData = {}
   const response = await fetch(
-    `http://localhost/praktyki-turnus/server/api/course/?id=${courseId}`,
+    `${API_URL}/course/?id=${courseId}`,
     {
       method: "GET",
       headers: {
@@ -1016,6 +1076,7 @@ async function UI_redirectDetailsView(onlyUpdateVariables = false) {
           participantsData = {"participants":courseData.participants, "grades":courseData.grades}
           currentCourseSubjectList = courseData.subjects
           courseCode = data.course.code
+          currentCourseName = courseData.name
           if(onlyUpdateVariables == true) {
             UI_redirectParticipantView()
           }
